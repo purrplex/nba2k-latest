@@ -115,11 +115,7 @@ class Player(pygame.sprite.Sprite):
             key: self.load_animation(base_path + path, frames)
             for key, (path, frames) in animation_data.items()
         } 
-        self.animations = {
-            key: self.load_animation(base_path + path, frames)
-            for key, (path, frames) in animation_data.items()
-        }
-
+        
     def outofbounds(self, screen, time):
         screen.fill((0, 0, 0))
         my_font = pygame.font.Font("images/font.ttf", 100)

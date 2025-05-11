@@ -91,7 +91,7 @@ class Game:
         # Classes
         self.tipoff = TipOff()
 
-        self.player = Player((250, 450), self.player_group)
+        self.player = Player((1100, 500), self.player_group)
         self.inbounder = Inbounder(
             (250, 350),
             self.inbounder_group,
