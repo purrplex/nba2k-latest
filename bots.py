@@ -141,49 +141,49 @@ class Bots(pygame.sprite.Sprite):
         self.position = pygame.math.Vector2(250, 450)
         self.rect.center = round(self.position.x), round(self.position.y)
 
-    def move(self, dt, screen, time):
-        if self.direction.magnitude() != 0:
-            self.direction = self.direction.normalize()
+    # def move(self, dt, screen, time):
+    #     if self.direction.magnitude() != 0:
+    #         self.direction = self.direction.normalize()
 
-        # Gradually decrease speed
-        if self.speed > self.min_speed:
-            self.speed -= self.speed_decay * dt
+    #     # Gradually decrease speed
+    #     if self.speed > self.min_speed:
+    #         self.speed -= self.speed_decay * dt
 
-        # Update position
-        self.position += self.direction * self.speed * dt
-        if self.height != 0:
-            self.velocity += self.gravity * dt
-            self.height += self.velocity * dt
+    #     # Update position
+    #     self.position += self.direction * self.speed * dt
+    #     if self.height != 0:
+    #         self.velocity += self.gravity * dt
+    #         self.height += self.velocity * dt
 
-            if self.height < 0:
-                self.height = 0
-                self.velocity = 0
-                self.frame_index = 0
-                self.landing = True
-                self.stop = 0
+    #         if self.height < 0:
+    #             self.height = 0
+    #             self.velocity = 0
+    #             self.frame_index = 0
+    #             self.landing = True
+    #             self.stop = 0
 
-        self.rect.center = round(self.position.x), round(self.position.y - self.height)
+    #     self.rect.center = round(self.position.x), round(self.position.y - self.height)
 
-        self.scale_factor = max(1.0, min(1.5, 1 + (self.position.y - 400) / 500))
+    #     self.scale_factor = max(1.0, min(1.5, 1 + (self.position.y - 400) / 500))
 
-        self.speed = max(self.min_speed, min(self.speed, self.max_speed))
+    #     self.speed = max(self.min_speed, min(self.speed, self.max_speed))
 
-        if self.landing:
-            self.ball = False
-            self.pass_steal = False
+    #     if self.landing:
+    #         self.ball = False
+    #         self.pass_steal = False
 
-        if self.position.x < 20:
-            self.position.x = 20
+    #     if self.position.x < 20:
+    #         self.position.x = 20
 
-        if self.position.x > 2000 and not self.height != 0:
-            self.outofbounds(screen, time)
-            self.reset_position()
-            self.direction.y = 0
+    #     if self.position.x > 2000 and not self.height != 0:
+    #         self.outofbounds(screen, time)
+    #         self.reset_position()
+    #         self.direction.y = 0
 
-        if (self.position.y < 350 or self.position.y > 775) and not self.height != 0:
-            self.outofbounds(screen, time)
-            self.reset_position()
-            self.direction.y = 0
+    #     if (self.position.y < 350 or self.position.y > 775) and not self.height != 0:
+    #         self.outofbounds(screen, time)
+    #         self.reset_position()
+    #         self.direction.y = 0
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
