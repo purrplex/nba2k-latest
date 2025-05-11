@@ -1,6 +1,7 @@
 import pygame
 import time
 from player import Player
+from bots import Bots
 from inbounder import Inbounder
 from player_select import PlayerSelect
 from game_loop import game_loop
@@ -34,6 +35,7 @@ class Game:
 
         # groups
         self.player_group = AllSprites()
+        self.bots_group = AllSprites()
         self.inbounder_group = pygame.sprite.Group()
         self.testball_group = pygame.sprite.Group()
         self.player_select_group = pygame.sprite.Group()
@@ -92,6 +94,10 @@ class Game:
         self.tipoff = TipOff()
 
         self.player = Player((1100, 500), self.player_group)
+
+        self.bots = Bots((1200, 500), self.
+        bots_group)
+
         self.inbounder = Inbounder(
             (250, 350),
             self.inbounder_group,
