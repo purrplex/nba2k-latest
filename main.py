@@ -1,4 +1,5 @@
 import pygame
+import random
 import time
 from player import Player
 from bots import Bots
@@ -49,6 +50,7 @@ class Game:
         self.selected_player = None
         self.winner = None
         self.ball = False
+        self.offense_plays = ["41", "32", "5out"]
 
         # Menu variables
         self.selected_index3 = None
@@ -95,8 +97,79 @@ class Game:
 
         self.player = Player((1100, 500), self.player_group)
 
-        self.bots = Bots((1200, 500), self.
-        bots_group)
+        
+        self.bots = []
+
+        self.offense_play_picked = "41"
+        # random.choice(self.offense_plays)
+
+        if self.offense_play_picked == "41":
+            bot_coords_lakers = [
+                (1500, 550),
+                (1431, 645),
+                (1319, 609),
+                (1319, 491),
+                (1431, 455)
+                            
+            ]
+
+        if self.offense_play_picked == "32":
+            bot_coords_lakers = [
+                (1500, 550),
+                (1431, 645),
+                (1319, 609),
+                (1319, 491),
+                (1431, 455)
+                            
+            ]
+
+        if self.offense_play_picked == "5out":
+            bot_coords_lakers = [
+                (1500, 550),
+                (1431, 645),
+                (1319, 609),
+                (1319, 491),
+                (1431, 455)
+                            
+            ]
+    
+        for name, coord in zip(self.playerselectlakers_menu_items, bot_coords_lakers):
+            if self.selected_player not in name:
+                self.bots.append(Bots("lakers", name, coord, (self.bots_group, self.player_group)))
+
+        if self.offense_play_picked == "41":
+            bot_coords_knicks = [
+                (1500, 550),
+                (1431, 645),
+                (1319, 609),
+                (1319, 491),
+                (1431, 455)
+                            
+            ]
+
+        if self.offense_play_picked == "32":
+            bot_coords_knicks = [
+                (1500, 550),
+                (1431, 645),
+                (1319, 609),
+                (1319, 491),
+                (1431, 455)
+                            
+            ]
+
+        if self.offense_play_picked == "5out":
+            bot_coords_knicks = [
+                (1500, 550),
+                (1431, 645),
+                (1319, 609),
+                (1319, 491),
+                (1431, 455)
+                            
+            ]
+        
+        for name, coord in zip(self.playerselectknicks_menu_items, bot_coords_knicks):
+            if self.selected_player not in name:
+                self.bots.append(Bots("knicks", name, coord, (self.bots_group, self.player_group)))
 
         self.inbounder = Inbounder(
             (250, 350),

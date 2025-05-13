@@ -64,15 +64,6 @@ def game_loop(self):
                 self.show_score,
             )
 
-            self.bots_group.customize_draw(
-                self.bots,
-                self.screen,
-                self.background,
-                self.qtr,
-                self.show_qtr,
-                self.show_score,
-            )
-
 
             # self.testball_group.draw(self.screen)
             self.ball = self.testball.update(self.ball)
