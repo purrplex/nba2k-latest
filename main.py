@@ -47,7 +47,7 @@ class Game:
         self.snap = False
         self.menu = False
         self.team = None
-        self.selected_player = None
+        self.selected_player = "brunson"
         self.winner = None
         self.ball = False
         self.offense_plays = ["41", "32", "5out"]
@@ -105,11 +105,11 @@ class Game:
 
         if self.offense_play_picked == "41":
             bot_coords_lakers = [
-                (1500, 550),
-                (1431, 645),
-                (1319, 609),
-                (1319, 491),
-                (1431, 455)
+                (1220, 570),
+                (1371, 415),
+                (1659, 729),
+                (1620, 420),
+                (1640, 570)
                             
             ]
 
@@ -140,10 +140,10 @@ class Game:
         if self.offense_play_picked == "41":
             bot_coords_knicks = [
                 (1500, 550),
-                (1431, 645),
-                (1319, 609),
-                (1319, 491),
-                (1431, 455)
+                (1331, 395),
+                (1619, 709),
+                (1580, 400),
+                (1600, 550)
                             
             ]
 
