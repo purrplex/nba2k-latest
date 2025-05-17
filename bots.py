@@ -299,15 +299,14 @@ class Bots(pygame.sprite.Sprite):
         speed_rect.midtop = (100, 10)
         screen.blit(speed_surface, speed_rect)
 
-    def update(self, dt, events, screen, time, team, winner, ball):
+    def update(self, dt, screen, time, team, winner, ball):
         self.ball = ball
         self.winner = winner
-        self.team = team
+        # self.team = team
         self.outOfBounds = False
-        self.input(events)
-        self.move(dt, screen, time)
-        self.move_basketball(dt)
+        # self.move(dt, screen, time)
+        # self.move_basketball(dt)
         self.animate(dt)
-        self.import_assets()
+        # self.import_assets()
 
         return (self.outOfBounds, self.ball)

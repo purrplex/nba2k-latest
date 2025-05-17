@@ -64,6 +64,7 @@ def game_loop(self):
                 self.show_score,
             )
 
+            self.bots_group.update(dt, self.screen, time, self.team, self.winner, self.ball)
 
             # self.testball_group.draw(self.screen)
             self.ball = self.testball.update(self.ball)
