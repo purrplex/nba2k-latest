@@ -100,7 +100,7 @@ class Game:
         
         self.bots = []
 
-        self.offense_play_picked = "41"
+        self.offense_play_picked = "5out"
         # random.choice(self.offense_plays)
 
         if self.offense_play_picked == "41":
@@ -115,21 +115,20 @@ class Game:
 
         if self.offense_play_picked == "32":
             bot_coords_lakers = [
-                (1500, 550),
-                (1431, 645),
-                (1319, 609),
-                (1319, 491),
-                (1431, 455)
-                            
+                (1220, 570),
+                (1371, 415),
+                (1359, 659),
+                (1620, 420),
+                (1640, 570)
             ]
 
         if self.offense_play_picked == "5out":
             bot_coords_lakers = [
-                (1500, 550),
-                (1431, 645),
-                (1319, 609),
-                (1319, 491),
-                (1431, 455)
+                (1220, 570),
+                (1371, 515),
+                (1359, 659),
+                (1620, 420),
+                (1640, 770)
                             
             ]
     
@@ -150,10 +149,10 @@ class Game:
         if self.offense_play_picked == "32":
             bot_coords_knicks = [
                 (1500, 550),
-                (1431, 645),
-                (1319, 609),
-                (1319, 491),
-                (1431, 455)
+                (1331, 395),
+                (1331, 639),
+                (1580, 450),
+                (1600, 700)
                             
             ]
 
@@ -162,7 +161,7 @@ class Game:
                 (1500, 550),
                 (1431, 645),
                 (1319, 609),
-                (1319, 491),
+                (1319, 391),
                 (1431, 455)
                             
             ]
