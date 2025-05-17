@@ -10,9 +10,9 @@ class Bots(pygame.sprite.Sprite):
         self.WINDOW_WIDTH, self.WINDOW_HEIGHT = 1215, 812
         self.winner = None
         self.team = None
-        self.status = "right"
+        self.status = ""
         self.frame_index = 0
-        self.direction = pygame.math.Vector2(1, 0)
+        self.direction = pygame.math.Vector2(0, 0)
         self.position = pygame.math.Vector2(pos)
         self.rect = None
         self.selected_player = "brunson"
