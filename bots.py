@@ -106,7 +106,6 @@ class Bots(pygame.sprite.Sprite):
             player = "brunson"
 
 
-        bot = "hart"
         # Generate the base path dynamically
         base_path = f"images/{self.team}/{self.name}/{self.name}_"
 
@@ -142,6 +141,50 @@ class Bots(pygame.sprite.Sprite):
         self.speed = 0
         self.position = pygame.math.Vector2(250, 450)
         self.rect.center = round(self.position.x), round(self.position.y)
+
+    def move(self, dt, screen, time):
+        if self.direction.magnitude() != 0:
+            self.direction = self.direction.normalize()
+
+        # Gradually decrease speed
+        if self.speed > self.min_speed:
+            self.speed -= self.speed_decay * dt
+
+        # Update position
+        self.position += self.direction * self.speed * dt
+        if self.height != 0:
+            self.velocity += self.gravity * dt
+            self.height += self.velocity * dt
+
+            if self.height < 0:
+                self.height = 0
+                self.velocity = 0
+                self.frame_index = 0
+                self.landing = True
+                self.stop = 0
+
+        self.rect.center = round(self.position.x), round(self.position.y - self.height)
+
+        self.scale_factor = max(1.0, min(1.5, 1 + (self.position.y - 400) / 500))
+
+        self.speed = max(self.min_speed, min(self.speed, self.max_speed))
+
+        if self.landing:
+            self.ball = False
+            self.pass_steal = False
+
+        if self.position.x < 20:
+            self.position.x = 20
+
+        if self.position.x > 2000 and not self.height != 0:
+            self.outofbounds(screen, time)
+            self.reset_position()
+            self.direction.y = 0
+
+        if (self.position.y < 350 or self.position.y > 775) and not self.height != 0:
+            self.outofbounds(screen, time)
+            self.reset_position()
+            self.direction.y = 0
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
@@ -299,14 +342,23 @@ class Bots(pygame.sprite.Sprite):
         speed_rect.midtop = (100, 10)
         screen.blit(speed_surface, speed_rect)
 
-    def update(self, dt, screen, time, team, winner, ball):
+    def defender(self, bot_defender):
+        if self.name == "lebron":
+            self.position.x = bot_defender.x + 80
+            self.position.y = bot_defender.y + 80
+            self.status = "left"
+            if self.direction == pygame.math.Vector2(0, 0):
+                self.is_idle = True
+
+                
+
+    def update(self, dt, screen, time, winner, ball, bot_defender):
         self.ball = ball
         self.winner = winner
-        # self.team = team
+        self.bot_defender = bot_defender
         self.outOfBounds = False
-        # self.move(dt, screen, time)
-        # self.move_basketball(dt)
+        self.defender(bot_defender)
+        self.move(dt, screen, time)
         self.animate(dt)
-        # self.import_assets()
 
         return (self.outOfBounds, self.ball)
