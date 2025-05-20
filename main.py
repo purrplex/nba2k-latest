@@ -49,7 +49,7 @@ class Game:
         self.team = None
         self.selected_player = "brunson"
         self.winner = None
-        self.ball = False
+        self.ball = True
         self.offense_plays = ["41", "32", "5out"]
 
         # Menu variables

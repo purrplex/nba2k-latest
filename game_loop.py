@@ -64,11 +64,11 @@ def game_loop(self):
                 self.show_score,
             )
 
-            self.bots_group.update(dt, self.screen, time, self.winner, self.ball,  self.player.position)
+            self.bots_group.update(dt, self.screen, time, self.winner,  self.player.position)
 
-            # self.testball_group.draw(self.screen)
-            self.ball = self.testball.update(self.ball)
-            self.ball = self.testball2.update(self.ball)
+            # # self.testball_group.draw(self.screen)
+            # self.ball = self.testball.update(self.ball)
+            # self.ball = self.testball2.update(self.ball)
 
             self.outOfBounds, self.ball = self.player.update(
                 dt, events, self.screen, time, self.team, self.winner, self.ball, self.selected_player

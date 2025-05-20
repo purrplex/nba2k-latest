@@ -36,7 +36,7 @@ class Bots(pygame.sprite.Sprite):
         self.speed_decay = 100
 
         self.stop = 0
-        self.ball = None
+        self.ball = False
         self.pass_steal = False
         self.stealing = False
         self.landing = None
@@ -352,8 +352,8 @@ class Bots(pygame.sprite.Sprite):
 
                 
 
-    def update(self, dt, screen, time, winner, ball, bot_defender):
-        self.ball = ball
+    def update(self, dt, screen, time, winner, bot_defender):
+        # self.ball = ball
         self.winner = winner
         self.bot_defender = bot_defender
         self.outOfBounds = False
@@ -361,4 +361,4 @@ class Bots(pygame.sprite.Sprite):
         self.move(dt, screen, time)
         self.animate(dt)
 
-        return (self.outOfBounds, self.ball)
+        return (self.outOfBounds)
