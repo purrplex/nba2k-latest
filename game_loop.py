@@ -40,8 +40,8 @@ def game_loop(self):
             self.inbounder.snap_throw_instructions(self.screen)
 
             # self.testball_group.draw(self.screen)
-            self.ball = self.testball.update(self.ball)
-            self.ball = self.testball2.update(self.ball)
+            # self.ball = self.testball.update(self.ball)
+            # self.ball = self.testball2.update(self.ball)
 
         else:
             (

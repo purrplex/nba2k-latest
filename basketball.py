@@ -32,6 +32,14 @@ class Basketball(pygame.sprite.Sprite):
 
         self.scale_factor = 1.0
 
+
+    def ball_movement(self):
+        if self.height > 0:
+            self.height =- 1
+
+        if self.width > 0:
+            self.width =- 1
+
     def update(self, dt):
         self.pos += self.direction * self.speed * dt
         self.rect.topleft = (round(self.pos.x), round(self.pos.y))
@@ -73,8 +81,9 @@ class Basketball(pygame.sprite.Sprite):
             if sprite != self and sprite != self.player
         ]
 
+
         if colliding_sprites:
-            self.remove()
+            self.ball_movement()
 
         if self.rect.left > 2100 or self.rect.left < 0 or self.rect.bottom < 0:
-            self.remove()
+            self.ball_movement()

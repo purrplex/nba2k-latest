@@ -177,14 +177,14 @@ class Game:
             self.snap,
         )
 
-        self.testball = TestBall(
-            (200, 700),
-            (self.testball_group, self.player_group),
-        )
-        self.testball2 = TestBall(
-            (1960, 700),
-            (self.testball_group, self.player_group),
-        )
+        # self.testball = TestBall(
+        #     (200, 700),
+        #     (self.testball_group, self.player_group),
+        # )
+        # self.testball2 = TestBall(
+        #     (1960, 700),
+        #     (self.testball_group, self.player_group),
+        # )
 
         # channels
         if not hasattr(self, "start_channel"):
