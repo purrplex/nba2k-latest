@@ -28,7 +28,7 @@ class Basketball(pygame.sprite.Sprite):
         self.gravity = -800
 
         self.velocity = self.jump_speed
-        self.height = self.jump_startball
+        self.height = self.jump_start
 
         self.scale_factor = 1.0
 
@@ -49,7 +49,7 @@ class Basketball(pygame.sprite.Sprite):
                     self.height = 0
                     self.velocity = 0
                     self.shooting = False
-                    self.release()
+                    self.group.remove(self)
 
         self.rect.center = round(self.pos.x), round(self.pos.y - self.height)
 
@@ -74,7 +74,7 @@ class Basketball(pygame.sprite.Sprite):
         ]
 
         if colliding_sprites:
-            self.release()
+            self.remove()
 
         if self.rect.left > 2100 or self.rect.left < 0 or self.rect.bottom < 0:
-            self.release()
+            self.remove()
