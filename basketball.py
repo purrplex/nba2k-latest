@@ -34,11 +34,8 @@ class Basketball(pygame.sprite.Sprite):
 
 
     def ball_movement(self):
-        if self.pos.x > 0:
-            self.pos.x =- 1
-
-        if self.pos.y > 0:
-            self.pos.y =- 1
+            
+           self.rect.right =- 1
 
     def update(self, dt):
         self.pos += self.direction * self.speed * dt
