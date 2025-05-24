@@ -83,4 +83,4 @@ class Basketball(pygame.sprite.Sprite):
             self.ball_movement()
 
         if self.rect.left > 2100 or self.rect.left < 0 or self.rect.bottom < 0:
-            self.ball_movement()
+            self.rect.left =-10
