@@ -3,7 +3,7 @@ import pygame
 
 class TestBall(pygame.sprite.Sprite):
     def __init__(self, pos, groups):
-        super().__init__(groups)
+        super().__init__((groups[0], groups[1]))
 
         self.group = groups
         self.original_image = pygame.image.load("images/basketball.png").convert_alpha()
@@ -23,13 +23,13 @@ class TestBall(pygame.sprite.Sprite):
         self.ball = ball
 
         colliding_sprites = pygame.sprite.spritecollide(
-            self, self.group[1], False, pygame.sprite.collide_mask
+            self, self.group[2], False, pygame.sprite.collide_mask
         )
 
         colliding_sprites = [
             sprite
             for sprite in colliding_sprites
-            if sprite != self and sprite != self.group[1]
+            if sprite != self and sprite != self.group[2]
         ]
 
         if colliding_sprites:

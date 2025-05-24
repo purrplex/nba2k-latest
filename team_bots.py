@@ -1,26 +1,45 @@
 import pygame
-import time
-from basketball import Basketball
+import random
+from pygame.math import Vector2 as vector
 
 
-class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, groups):
+class TeamBots(pygame.sprite.Sprite):
+
+    def __init__(
+        self,
+        pos,
+        groups,
+        player,
+        team,
+        selected_player,
+        play_name,
+        outOfBounds,
+        target_pos,
+    ):
         super().__init__(groups)
         self.group = groups
+        self.player = player
+        self.team = team
+        self.play_name = play_name
+        self.selected_player = selected_player
         self.WINDOW_WIDTH, self.WINDOW_HEIGHT = 1215, 812
         self.winner = None
-        self.team = None
         self.status = "right"
         self.frame_index = 0
-        self.direction = pygame.math.Vector2(1, 0)
-        self.position = pygame.math.Vector2(pos)
+        self.direction = vector(1, 0)
+
         self.rect = None
-        self.selected_player = "brunson"
+        self.outOfBounds = outOfBounds
+        self.play = None
 
         self.import_assets()
         self.animation = self.animations["idle"]
         self.image = self.animation[self.frame_index]
         self.rect = self.image.get_rect(center=pos)
+
+        self.position = vector(self.rect.center)
+        self.target_pos = target_pos
+        self.target_position = vector(self.target_pos[0])
 
         self.height = 0
         self.velocity = 0
@@ -33,10 +52,9 @@ class Player(pygame.sprite.Sprite):
         self.min_speed = 200
         self.speed_decay = 100
 
+        self.stop = 0
         self.ball = None
         self.pass_steal = False
-        self.passing = False
-        self.steal = False
         self.stealing = False
         self.landing = None
         self.flopping = False
@@ -44,8 +62,13 @@ class Player(pygame.sprite.Sprite):
         self.before_jump = None
         self.is_idle = False
         self.basketball = None
-        self.basketball_created = False
         self.scale_factor = 1.0
+
+        self.notice_radius = 1000
+        self.move_radius = 850
+        self.guard_radius = 10
+
+        self.last_move_time = pygame.time.get_ticks()
 
         self.jump_sound = pygame.mixer.Sound("images/sounds/jump.wav")
         self.jump_sound.set_volume(0.05)
@@ -105,9 +128,9 @@ class Player(pygame.sprite.Sprite):
                 team = "knicks"
                 player = self.selected_player
 
-        if not self.selected_player:
-            team = "knicks"
-            player = "brunson"
+        """if self.selected_player:
+            team = "lakers"
+            player = self.selected_player"""
 
         # Generate the base path dynamically
         base_path = f"images/{team}/{player}/{player}_"
@@ -135,17 +158,77 @@ class Player(pygame.sprite.Sprite):
 
         self.speed = 0
         self.outOfBounds = True
-        self.direction = pygame.math.Vector2(1, 0)
+        self.direction = vector(1, 0)
+        self.player = None
 
     def reset_position(self):
         self.status = "right"
         self.speed = 0
-        self.position = pygame.math.Vector2(1100, 500)
+        self.position = vector(250, 450)
         self.rect.center = round(self.position.x), round(self.position.y)
+
+    def get_position_distance_direction(self):
+        # Change target every 2 seconds
+        current_time = pygame.time.get_ticks()
+        if current_time - self.last_move_time > 2000:
+            self.target_position = random.choice(self.target_pos)
+            self.last_move_time = current_time
+
+        distance = (self.target_position - self.position).magnitude()
+
+        if distance != 0:
+            direction = (self.target_position - self.position).normalize()
+        else:
+            direction = vector()
+
+        return (distance, direction)
+
+    def get_player_distance_direction(self):
+        enemy_pos = vector(self.rect.center)
+        player_pos = vector(self.player.rect.center)
+        distance = (player_pos - enemy_pos).magnitude()
+
+        if distance != 0:
+            direction = (player_pos - enemy_pos).normalize()
+        else:
+            direction = vector()
+
+        return (distance, direction)
+
+    def face_player(self):
+        distance, direction = self.get_player_distance_direction()
+
+        if distance < self.notice_radius:
+            if -0.95 < direction.y < 0.95:
+                if direction.x < 0:  # player to the left
+                    self.direction.x = -1
+                    self.status = "left"
+                elif direction.x > 0:  # player to the right
+                    self.direction.x = 1
+                    self.status = "right"
+
+    def move_to_position(self):
+        """self.is_idle = True
+        self.speed = 0
+        self.direction = vector(0, 0)"""
+
+        distance, direction = self.get_position_distance_direction()
+
+        if self.guard_radius < distance < self.move_radius:
+            self.is_idle = False
+            self.direction = direction
+            self.speed += 1
+        else:
+            self.is_idle = True
+            self.speed = 0
+            self.direction = vector(0, 0)
 
     def move(self, dt, screen, time):
         if self.direction.magnitude() != 0:
             self.direction = self.direction.normalize()
+
+        self.face_player()
+        self.move_to_position()
 
         # Gradually decrease speed
         if self.speed > self.min_speed:
@@ -162,6 +245,7 @@ class Player(pygame.sprite.Sprite):
                 self.velocity = 0
                 self.frame_index = 0
                 self.landing = True
+                self.stop = 0
 
         self.rect.center = round(self.position.x), round(self.position.y - self.height)
 
@@ -171,13 +255,12 @@ class Player(pygame.sprite.Sprite):
 
         if self.landing:
             self.ball = False
-            self.passing = False
-            self.steal = False
+            self.pass_steal = False
 
         if self.position.x < 20:
             self.position.x = 20
 
-        if self.position.x > 2000 and not self.height != 0:
+        """if self.position.x > 2000 and not self.height != 0:
             self.outofbounds(screen, time)
             self.reset_position()
             self.direction.y = 0
@@ -185,80 +268,7 @@ class Player(pygame.sprite.Sprite):
         if (self.position.y < 350 or self.position.y > 775) and not self.height != 0:
             self.outofbounds(screen, time)
             self.reset_position()
-            self.direction.y = 0
-
-    def draw(self, screen):
-        screen.blit(self.image, self.rect)
-
-    def input(self, events):
-        for event in events:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    self.speed += 50
-
-                if event.key == pygame.K_w and self.height == 0:
-                    self.jump_sound.play()
-                    self.velocity = self.jump_speed
-                    self.height = self.jump_start
-                    self.animation = self.animation
-                    self.basketball_created = False
-                    self.frame_index = 0
-                    self.direction = pygame.math.Vector2(0, 0)
-
-                if event.key == pygame.K_d and not self.passing and self.ball:
-                    self.passing = True
-                    self.frame_index = 0
-                elif event.key == pygame.K_d and not self.steal and not self.ball:
-                    self.steal = True
-                    self.frame_index = 0
-
-                if event.key == pygame.K_a and not self.flopping and not self.ball:
-                    self.flopping = True
-                    self.frame_index = 0
-
-                if event.key == pygame.K_s and not self.falling and not self.ball:
-                    self.falling = True
-                    self.frame_index = 0
-
-        keys = pygame.key.get_pressed()
-
-        if not self.ball:
-            # Reset direction
-            self.is_idle = True
-            self.direction.x = 0
-            self.direction.y = 0
-
-            # Horizontal movement
-            if keys[pygame.K_RIGHT]:
-                self.is_idle = False
-                self.status = "right"
-                self.direction.x = 1
-            elif keys[pygame.K_LEFT]:
-                self.is_idle = False
-                self.status = "left"
-                self.direction.x = -1
-
-            # Vertical movement
-            if keys[pygame.K_UP]:
-                self.is_idle = False
-                self.direction.y = -1
-            if keys[pygame.K_DOWN]:
-                self.is_idle = False
-                self.direction.y = 1
-        else:
-            if not self.passing and not self.steal:
-                if keys[pygame.K_RIGHT]:
-                    self.status = "right"
-                    self.direction.x = 1
-                elif keys[pygame.K_LEFT]:
-                    self.status = "left"
-                    self.direction.x = -1
-
-                # Vertical movement
-                if keys[pygame.K_UP]:
-                    self.direction.y = -1
-                if keys[pygame.K_DOWN]:
-                    self.direction.y = 1
+            self.direction.y = 0"""
 
     def animate(self, dt):
         if self.height != 0:
@@ -282,7 +292,7 @@ class Player(pygame.sprite.Sprite):
                     else:
                         self.animation = self.animations["dribble_right"]
                         self.direction.x = 1
-                    if self.passing:
+                    if self.pass_steal:
                         self.animation = self.animations["pass"]
                 elif self.status == "left":
                     if self.landing:
@@ -291,7 +301,7 @@ class Player(pygame.sprite.Sprite):
                     else:
                         self.animation = self.animations["dribble_left"]
                         self.direction.x = -1
-                    if self.passing:
+                    if self.pass_steal:
                         self.animation = self.animations["pass_left"]
             else:
                 if self.status == "right":
@@ -304,7 +314,7 @@ class Player(pygame.sprite.Sprite):
                         self.animation = self.animations["idle"]
                         self.direction.x = 0
 
-                    if self.steal:
+                    if self.pass_steal:
                         self.animation = self.animations["steal"]
 
                     if self.flopping:
@@ -325,7 +335,7 @@ class Player(pygame.sprite.Sprite):
                         self.animation = self.animations["idle_left"]
                         self.direction.x = 0
 
-                    if self.steal:
+                    if self.pass_steal:
                         self.animation = self.animations["steal_left"]
 
                     if self.flopping:
@@ -359,16 +369,19 @@ class Player(pygame.sprite.Sprite):
             if self.frame_index > len(self.animation) - 2:
                 self.frame_index = len(self.animation) - 1
 
+                if self.stop == 0:
+                    self.stop += 1
+
                 if self.ball:
                     self.speed = 0
-
-                self.steal = False
+                self.pass_steal = False
                 self.landing = False
                 self.flopping = False
                 self.falling = False
 
             else:
-                if self.ball or self.landing or self.passing or self.steal:
+                self.pass_steal = True
+                if self.ball or self.landing or self.pass_steal:
                     self.speed = 0
                 else:
                     self.speed = self.speed
@@ -386,94 +399,11 @@ class Player(pygame.sprite.Sprite):
         )
         self.rect = self.image.get_rect(center=self.rect.center)
 
-    def draw_speed_meter(self, screen):
-        bar_width = 200
-        bar_height = 20
-        bar_x = 170
-        bar_y = 20
-        pygame.draw.rect(screen, (255, 255, 255), (bar_x, bar_y, bar_width, bar_height))
-
-        # Calculate the width of the green bar based on the player's speed
-        green_bar_width = int(
-            (self.speed - self.min_speed)
-            / (self.max_speed - self.min_speed)
-            * bar_width
-        )
-
-        pygame.draw.rect(
-            screen, (0, 255, 0), (bar_x, bar_y, green_bar_width, bar_height)
-        )
-        my_font = pygame.font.Font("images/font.ttf", 50)
-        speed_surface = my_font.render("SPEED:", True, pygame.Color(255, 255, 255))
-        speed_rect = speed_surface.get_rect()
-        speed_rect.midtop = (100, 10)
-        screen.blit(speed_surface, speed_rect)
-
-    def move_basketball(self, dt):
-        if self.ball:
-            if self.height != 0:
-
-                if self.frame_index == len(self.animation) - 1:
-
-                    if self.basketball_created == False:
-
-                        if self.status == "right":
-                            self.basketball = Basketball(
-                                (
-                                    self.rect.topright[0] - 50,
-                                    self.rect.topright[1] + 10,
-                                ),
-                                self,
-                                time,
-                                pygame.math.Vector2(1, 0),
-                            )
-
-                        elif self.status == "left":
-                            self.basketball = Basketball(
-                                (self.rect.topleft[0] + 50, self.rect.topleft[1] + 10),
-                                self,
-                                time,
-                                pygame.math.Vector2(-1, 0),
-                            )
-                    self.basketball_created = True
-
-            elif self.passing:
-                if self.frame_index == len(self.animation) - 1:
-
-                    if self.status == "right":
-                        self.basketball = Basketball(
-                            (self.rect.midright[0] - 50, self.rect.midright[1] + 10),
-                            self,
-                            time,
-                            pygame.math.Vector2(1, 0),
-                        )
-
-                    elif self.status == "left":
-                        self.basketball = Basketball(
-                            (self.rect.midleft[0] + 50, self.rect.midleft[1] + 10),
-                            self,
-                            time,
-                            pygame.math.Vector2(-1, 0),
-                        )
-
-                    self.passing = False
-                    self.ball = False
-
-        if self.basketball:
-            self.basketball.update(dt)
-
-    def update(self, dt, events, screen, time, team, winner, ball, selected_player):
-        if (self.team, self.selected_player) != (team, selected_player):
-            self.team = team
-            self.selected_player = selected_player
-            self.import_assets()
-
-        self.ball = ball
+    def update(self, dt, screen, time, winner, ball):
+        self.ball = False
         self.winner = winner
-        self.outOfBounds = False
-        self.input(events)
+        self.outOfBounds = True
         self.move(dt, screen, time)
-        self.move_basketball(dt)
         self.animate(dt)
 
-        return (self.outOfBounds, self.ball)
+        return self.outOfBounds

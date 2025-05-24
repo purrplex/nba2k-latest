@@ -6,17 +6,8 @@ player_selected = "lebron"
 offense = True
 deffense = False
 
-offense_plays = ["41", "32", "5out"]
-
-offense_play_picked = random.choice(offense_plays)
-
-
-coordmap_offense = {}
-coordmap_defense ={}
-
-coordinates_41 = [(100,100), (200,200),(300,00), (400,400), (500,800)]
-coordinates_32 = [(100,100), (200,200),(300,00), (400,400), (500,800)]
-coordinates_5out = [(100,100), (200,200),(300,00), (400,400), (500,800)]
+offenseive_plays = ["4:1", "3:2", "5out"]
+offense_play = random.choice(offenseive_plays)
 
 
 def offensive_game_play():
@@ -34,25 +25,7 @@ def offensive_game_play():
 
     print("offensive_game_play:")
     print(matchups)
-    print(offense_play_picked)
-
-
-    if offense_play_picked == "41":
-        offensive_coordinates = coordinates_41
-    if offense_play_picked == "32":
-        offensive_coordinates = coordinates_32
-    if offense_play_picked == "5out":
-        offensive_coordinates = coordinates_5out
-
-    
-    for i in range(5):
-        coordmap_offense.update({knicks_players[i]: offensive_coordinates[i]})
-
-    for i in range(5):
-        coordmap_defense.update({lakers_players[i]: (offensive_coordinates[i][0] + 10, offensive_coordinates[i][1] + 10 )})    
-
-    print(coordmap_offense)
-    print(coordmap_defense)
+    print(offense_play)
 
 
 def defensive_game_play():

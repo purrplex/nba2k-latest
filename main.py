@@ -1,13 +1,13 @@
 import pygame
-import random
 import time
+import random
 from player import Player
-from bots import Bots
 from inbounder import Inbounder
 from player_select import PlayerSelect
 from game_loop import game_loop
 from all_sprites import AllSprites
 from test_ball import TestBall
+
 
 from menus import (
     start_menu,
@@ -24,6 +24,9 @@ from menus import (
 from tipoff.tipoff import TipOff
 from tipoff.tipoff_background import Background
 
+from team_bots import TeamBots
+from opp_bots import OppBots
+
 
 class Game:
     def __init__(self):
@@ -35,22 +38,26 @@ class Game:
         self.clock = pygame.time.Clock()
 
         # groups
-        self.player_group = AllSprites()
-        self.bots_group = AllSprites()
+        self.all_sprites_group = AllSprites()
+        self.player_group = pygame.sprite.Group()
+        self.bots_group = pygame.sprite.Group()
         self.inbounder_group = pygame.sprite.Group()
         self.testball_group = pygame.sprite.Group()
         self.player_select_group = pygame.sprite.Group()
 
         # variables
         self.outOfBounds = False
+        self.outOfBounds2 = False
         self.inbounder_is_active = True
         self.snap = False
         self.menu = False
-        self.team = None
+        self.team = "knicks"
         self.selected_player = "brunson"
         self.winner = None
-        self.ball = True
-        self.offense_plays = ["41", "32", "5out"]
+        self.ball = False
+        self.bot = None
+        self.team_bots_created = False
+        self.opp_bots_created = False
 
         # Menu variables
         self.selected_index3 = None
@@ -68,7 +75,45 @@ class Game:
 
         self.player_menu_items = ""
         self.playerselectknicks_menu_items = ["brunson", "melo", "hart", "og", "kat"]
-        self.playerselectlakers_menu_items = ["lebron", "kobe", "reeves", "luka", "hachi"]
+        self.playerselectlakers_menu_items = [
+            "lebron",
+            "kobe",
+            "reeves",
+            "luka",
+            "hachi",
+        ]
+
+        self.team_bots_pos = []
+
+        self.four_one = [
+            (1500, 550),
+            (1331, 395),
+            (1619, 709),
+            (1580, 400),
+            (1600, 550),
+        ]
+
+        self.three_two = [
+            (1500, 550),
+            (1331, 395),
+            (1331, 639),
+            (1580, 450),
+            (1600, 700),
+        ]
+
+        self.five_out = [
+            (1500, 550),
+            (1431, 645),
+            (1319, 609),
+            (1319, 391),
+            (1431, 455),
+        ]
+
+        self.plays = {
+            "4:1": self.four_one,
+            "3:2": self.three_two,
+            "5out": self.five_out,
+        }
 
         # Colors
         self.WHITE = (255, 255, 255)
@@ -95,81 +140,7 @@ class Game:
         # Classes
         self.tipoff = TipOff()
 
-        self.player = Player((1100, 500), self.player_group)
-
-        
-        self.bots = []
-
-        self.offense_play_picked = "5out"
-        # random.choice(self.offense_plays)
-
-        if self.offense_play_picked == "41":
-            bot_coords_lakers = [
-                (1220, 570),
-                (1371, 415),
-                (1659, 729),
-                (1620, 420),
-                (1640, 570)
-                            
-            ]
-
-        if self.offense_play_picked == "32":
-            bot_coords_lakers = [
-                (1220, 570),
-                (1371, 415),
-                (1359, 659),
-                (1620, 420),
-                (1640, 570)
-            ]
-
-        if self.offense_play_picked == "5out":
-            bot_coords_lakers = [
-                (1220, 570),
-                (1371, 515),
-                (1359, 659),
-                (1620, 420),
-                (1640, 770)
-                            
-            ]
-    
-        for name, coord in zip(self.playerselectlakers_menu_items, bot_coords_lakers):
-            if self.selected_player not in name:
-                self.bots.append(Bots("lakers", name, coord, (self.bots_group, self.player_group)))
-
-        if self.offense_play_picked == "41":
-            bot_coords_knicks = [
-                (1500, 550),
-                (1331, 395),
-                (1619, 709),
-                (1580, 400),
-                (1600, 550)
-                            
-            ]
-
-        if self.offense_play_picked == "32":
-            bot_coords_knicks = [
-                (1500, 550),
-                (1331, 395),
-                (1331, 639),
-                (1580, 450),
-                (1600, 700)
-                            
-            ]
-
-        if self.offense_play_picked == "5out":
-            bot_coords_knicks = [
-                (1500, 550),
-                (1431, 645),
-                (1319, 609),
-                (1319, 391),
-                (1431, 455)
-                            
-            ]
-        
-        for name, coord in zip(self.playerselectknicks_menu_items, bot_coords_knicks):
-            if self.selected_player not in name:
-                self.bots.append(Bots("knicks", name, coord, (self.bots_group, self.player_group)))
-
+        self.player = Player((1100, 500), (self.all_sprites_group, self.player_group))
         self.inbounder = Inbounder(
             (250, 350),
             self.inbounder_group,
@@ -177,14 +148,26 @@ class Game:
             self.snap,
         )
 
-        # self.testball = TestBall(
-        #     (200, 700),
-        #     (self.testball_group, self.player_group),
-        # )
-        # self.testball2 = TestBall(
-        #     (1960, 700),
-        #     (self.testball_group, self.player_group),
-        # )
+        self.team_bots = []
+
+        self.testball = TestBall(
+            (200, 700),
+            (
+                self.testball_group,
+                self.all_sprites_group,
+                self.player_group,
+                self.bots_group,
+            ),
+        )
+        self.testball2 = TestBall(
+            (1960, 700),
+            (
+                self.testball_group,
+                self.all_sprites_group,
+                self.player_group,
+                self.bots_group,
+            ),
+        )
 
         # channels
         if not hasattr(self, "start_channel"):
@@ -249,109 +232,7 @@ class Game:
         self.background = None
         self.transparent_background = Background().generate_background()
 
-    def ps_brunson(self):
-        self.selected_player = "brunson"
-        ts_brunson = pygame.image.load(
-            "images/knicks/brunson/brunson_idle/0.png"
-        ).convert_alpha()
-        self.screen.blit(
-            ts_brunson,
-            pygame.Rect(90, 385, 10, 10),
-        )
-
-    def ps_melo(self):
-        self.selected_player = "melo"
-        ts_melo = pygame.image.load(
-            "images/knicks/melo/melo_idle/0.png"
-        ).convert_alpha()
-        self.screen.blit(
-            ts_melo,
-            pygame.Rect(290, 305, 10, 10),
-        )
-
-    def ps_hart(self):
-        self.selected_player = "hart"
-        ts_hart = pygame.image.load(
-            "images/knicks/hart/hart_idle/0.png"
-        ).convert_alpha()
-        self.screen.blit(
-            ts_hart,
-            pygame.Rect(490, 305, 10, 10),
-        )
-
-    def ps_og(self):
-        self.selected_player = "og"
-        ts_og = pygame.image.load(
-            "images/knicks/og/og_idle/0.png"
-        ).convert_alpha()
-        self.screen.blit(
-            ts_og,
-            pygame.Rect(690, 305, 10, 10),
-        )
-
-    def ps_kat(self):
-        self.selected_player = "kat"
-        ts_kat = pygame.image.load(
-            "images/knicks/kat/kat_idle/0.png"
-        ).convert_alpha()
-        self.screen.blit(
-            ts_kat,
-            pygame.Rect(890, 305, 10, 10),
-        )
-
-    def ps_lebron(self):
-        self.selected_player = "lebron"
-        ts_lebron = pygame.image.load(
-            "images/lakers/lebron/lebron_idle/0.png"
-        ).convert_alpha()
-        self.screen.blit(
-            ts_lebron,
-            pygame.Rect(90, 305, 10, 10),
-        )
-
-    def ps_kobe(self):
-        self.selected_player = "kobe"
-        ts_kobe = pygame.image.load(
-            "images/lakers/kobe/kobe_idle/0.png"
-        ).convert_alpha()
-        self.screen.blit(
-            ts_kobe,
-            pygame.Rect(290, 305, 10, 10),
-        )
-
-    def ps_reeves(self):
-        self.selected_player = "reeves"
-        ts_reeves = pygame.image.load(
-            "images/lakers/reeves/reeves_idle/0.png"
-        ).convert_alpha()
-        self.screen.blit(
-            ts_reeves,
-            pygame.Rect(490, 305, 10, 10),
-        )
-
-    def ps_luka(self):
-        self.selected_player = "luka"
-        ts_luka = pygame.image.load(
-            "images/lakers/luka/luka_idle/0.png"
-        ).convert_alpha()
-        self.screen.blit(
-            ts_luka,
-            pygame.Rect(690, 305, 10, 10),
-        )
-
-    def ps_hachi(self):
-        self.selected_player = "hachi"
-        ts_hachi = pygame.image.load(
-            "images/lakers/hachi/hachi_idle/0.png"
-        ).convert_alpha()
-        self.screen.blit(
-            ts_hachi,
-            pygame.Rect(890, 305, 10, 10),
-        )
-
-
     # Functions
-
     def player_select(self):
         dt = self.clock.tick() / 1000
 
@@ -392,6 +273,72 @@ class Game:
                     f"{team_name}_{name}_select",
                     PlayerSelect(pos, self.player_select_group, team_name, name),
                 )
+
+    def spawn_team_bots(self):
+        if not self.team_bots_created:
+            if self.team == "knicks":
+                bots = self.playerselectknicks_menu_items
+                team = "knicks"
+            elif self.team == "lakers":
+                bots = self.playerselectlakers_menu_items
+                team = "lakers"
+
+            random.shuffle(bots)
+
+            play_name, play_coords = random.choice(list(self.plays.items()))
+
+            for i in range(5):
+                coords = play_coords[i]
+
+                pos_x = coords[0]
+                pos_y = coords[1]
+
+                target_pos = [self.four_one[i], self.three_two[i], self.five_out[i]]
+
+                if self.playerselectknicks_menu_items[i] == self.selected_player:
+                    self.team_bots.append(self.player)
+
+                    self.team_bots_pos.append(
+                        (self.player.position[0], self.player.position[1])
+                    )
+                else:
+                    self.team_bots_pos.append((pos_x, pos_y))
+
+                    self.team_bots.append(
+                        TeamBots(
+                            (pos_x, pos_y),
+                            (self.all_sprites_group, self.bots_group),
+                            self.player,
+                            team,
+                            bots[i],
+                            play_name,
+                            self.outOfBounds,
+                            target_pos,
+                        )
+                    )
+            self.team_bots_created = True
+
+    def spawn_opp_bots(self):
+        if not self.opp_bots_created:
+            if self.team == "knicks":
+                bots = self.playerselectlakers_menu_items
+                team = "knicks"
+            elif self.team == "lakers":
+                bots = self.playerselectknicks_menu_items
+                team = "lakers"
+
+            random.shuffle(bots)
+
+            for i in range(5):
+                OppBots(
+                    (self.team_bots_pos[i][0] + 120, self.team_bots_pos[i][1]),
+                    (self.all_sprites_group, self.bots_group),
+                    self.team_bots[i],
+                    team,
+                    bots[i],
+                    self.outOfBounds,
+                )
+            self.opp_bots_created = True
 
     def show_qtr(self, qtr, screen):
         self.qtr = qtr % 4
@@ -538,10 +485,7 @@ class Game:
 
     def run(self):
         self.game_loop()
-        # self.start_menu()
-        """
-        self.game_loop()
-        """
+        self.start_menu()
 
 
 if __name__ == "__main__":

@@ -1,23 +1,23 @@
 import pygame
-import time
-from basketball import Basketball
-import random
+from pygame.math import Vector2 as vector
 
-class Bots(pygame.sprite.Sprite):
-    def __init__(self, team, name, pos, groups):
+
+class OppBots(pygame.sprite.Sprite):
+
+    def __init__(self, pos, groups, player, team, selected_player, outOfBounds):
         super().__init__(groups)
         self.group = groups
+        self.player = player
+        self.team = team
+        self.selected_player = selected_player
         self.WINDOW_WIDTH, self.WINDOW_HEIGHT = 1215, 812
         self.winner = None
-        self.team = None
-        self.status = ""
+        self.status = "right"
         self.frame_index = 0
-        self.direction = pygame.math.Vector2(0, 0)
-        self.position = pygame.math.Vector2(pos)
+        self.direction = vector(1, 0)
+        self.position = vector(pos)
         self.rect = None
-        self.selected_player = "brunson"
-        self.team = team
-        self.name = name
+        self.outOfBounds = outOfBounds
 
         self.import_assets()
         self.animation = self.animations["idle"]
@@ -36,7 +36,7 @@ class Bots(pygame.sprite.Sprite):
         self.speed_decay = 100
 
         self.stop = 0
-        self.ball = False
+        self.ball = None
         self.pass_steal = False
         self.stealing = False
         self.landing = None
@@ -46,6 +46,10 @@ class Bots(pygame.sprite.Sprite):
         self.is_idle = False
         self.basketball = None
         self.scale_factor = 1.0
+
+        self.notice_radius = 1000
+        self.move_radius = 350
+        self.guard_radius = 120
 
         self.jump_sound = pygame.mixer.Sound("images/sounds/jump.wav")
         self.jump_sound.set_volume(0.05)
@@ -89,34 +93,35 @@ class Bots(pygame.sprite.Sprite):
             "fall_left": ("fall_left/", 12),
         }
 
-                # Determine which player's animations to load
+        # Determine which player's animations to load
         if self.winner:
             if self.team == "knicks":
-                team = "knicks"
-            else:
                 team = "lakers"
+                player = self.selected_player
+            else:
+                team = "knicks"
+                player = self.selected_player
         else:
             if self.team == "lakers":
-                team = "lakers"
-            else:
                 team = "knicks"
+                player = self.selected_player
+            else:
+                team = "lakers"
+                player = self.selected_player
 
-        if not self.selected_player:
-            team = "knicks"
-            player = "brunson"
-
+        """if self.selected_player:
+            team = "lakers"
+            player = self.selected_player"""
 
         # Generate the base path dynamically
-        base_path = f"images/{self.team}/{self.name}/{self.name}_"
+        base_path = f"images/{team}/{player}/{player}_"
 
         # Load animations dynamically
         self.animations = {
             key: self.load_animation(base_path + path, frames)
             for key, (path, frames) in animation_data.items()
-        } 
+        }
 
-
-        
     def outofbounds(self, screen, time):
         screen.fill((0, 0, 0))
         my_font = pygame.font.Font("images/font.ttf", 100)
@@ -134,17 +139,58 @@ class Bots(pygame.sprite.Sprite):
 
         self.speed = 0
         self.outOfBounds = True
-        self.direction = pygame.math.Vector2(1, 0)
+        self.direction = vector(1, 0)
+        self.player = None
 
     def reset_position(self):
         self.status = "right"
         self.speed = 0
-        self.position = pygame.math.Vector2(250, 450)
+        self.position = vector(250, 450)
         self.rect.center = round(self.position.x), round(self.position.y)
+
+    def get_player_distance_direction(self):
+        enemy_pos = vector(self.rect.center)
+        player_pos = vector(self.player.rect.center)
+        """print("enemy_pos", enemy_pos)
+        print("player_pos", player_pos)"""
+        distance = (player_pos - enemy_pos).magnitude()
+
+        if distance != 0:
+            direction = (player_pos - enemy_pos).normalize()
+        else:
+            direction = vector()
+
+        return (distance, direction)
+
+    def face_player(self):
+        distance, direction = self.get_player_distance_direction()
+
+        if distance < self.notice_radius:
+            if -0.95 < direction.y < 0.95:
+                if direction.x < 0:  # player to the left
+                    self.direction.x = -1
+                    self.status = "left"
+                elif direction.x > 0:  # player to the right
+                    self.direction.x = 1
+                    self.status = "right"
+
+    def move_to_player(self):
+        distance, direction = self.get_player_distance_direction()
+        if self.guard_radius < distance < self.move_radius:
+            self.is_idle = False
+            self.direction = direction
+            self.speed += 1
+        else:
+            self.is_idle = True
+            self.speed = 0
+            self.direction = vector(0, 0)
 
     def move(self, dt, screen, time):
         if self.direction.magnitude() != 0:
             self.direction = self.direction.normalize()
+
+        self.face_player()
+        self.move_to_player()
 
         # Gradually decrease speed
         if self.speed > self.min_speed:
@@ -176,7 +222,7 @@ class Bots(pygame.sprite.Sprite):
         if self.position.x < 20:
             self.position.x = 20
 
-        if self.position.x > 2000 and not self.height != 0:
+        """if self.position.x > 2000 and not self.height != 0:
             self.outofbounds(screen, time)
             self.reset_position()
             self.direction.y = 0
@@ -184,10 +230,7 @@ class Bots(pygame.sprite.Sprite):
         if (self.position.y < 350 or self.position.y > 775) and not self.height != 0:
             self.outofbounds(screen, time)
             self.reset_position()
-            self.direction.y = 0
-
-    def draw(self, screen):
-        screen.blit(self.image, self.rect)
+            self.direction.y = 0"""
 
     def animate(self, dt):
         if self.height != 0:
@@ -318,47 +361,11 @@ class Bots(pygame.sprite.Sprite):
         )
         self.rect = self.image.get_rect(center=self.rect.center)
 
-
-    def draw_speed_meter(self, screen):
-        bar_width = 200
-        bar_height = 20
-        bar_x = 170
-        bar_y = 20
-        pygame.draw.rect(screen, (255, 255, 255), (bar_x, bar_y, bar_width, bar_height))
-
-        # Calculate the width of the green bar based on the player's speed
-        green_bar_width = int(
-            (self.speed - self.min_speed)
-            / (self.max_speed - self.min_speed)
-            * bar_width
-        )
-
-        pygame.draw.rect(
-            screen, (0, 255, 0), (bar_x, bar_y, green_bar_width, bar_height)
-        )
-        my_font = pygame.font.Font("images/font.ttf", 50)
-        speed_surface = my_font.render("SPEED:", True, pygame.Color(255, 255, 255))
-        speed_rect = speed_surface.get_rect()
-        speed_rect.midtop = (100, 10)
-        screen.blit(speed_surface, speed_rect)
-
-    def defender(self, bot_defender):
-        if self.name == "lebron":
-            self.position.x = bot_defender.x + 80
-            self.position.y = bot_defender.y + 80
-            self.status = "left"
-            if self.direction == pygame.math.Vector2(0, 0):
-                self.is_idle = True
-
-                
-
-    def update(self, dt, screen, time, winner, bot_defender):
-        # self.ball = ball
+    def update(self, dt, screen, time, winner, ball):
+        self.ball = False
         self.winner = winner
-        self.bot_defender = bot_defender
-        self.outOfBounds = False
-        self.defender(bot_defender)
+        self.outOfBounds = True
         self.move(dt, screen, time)
         self.animate(dt)
 
-        return (self.outOfBounds)
+        return self.outOfBounds

@@ -12,7 +12,7 @@ class Basketball(pygame.sprite.Sprite):
         self.pos = pygame.math.Vector2(self.rect.midleft)
         self.direction = direction
 
-        self.group = player.group
+        self.group = player.group[0]
 
         self.speed = 400
         self.time = time
@@ -32,11 +32,6 @@ class Basketball(pygame.sprite.Sprite):
 
         self.scale_factor = 1.0
 
-
-    def ball_movement(self):
-            
-           self.rect.right =- 1
-
     def update(self, dt):
         self.pos += self.direction * self.speed * dt
         self.rect.topleft = (round(self.pos.x), round(self.pos.y))
@@ -54,7 +49,7 @@ class Basketball(pygame.sprite.Sprite):
                     self.height = 0
                     self.velocity = 0
                     self.shooting = False
-                    self.group.remove(self)
+                    self.kill()
 
         self.rect.center = round(self.pos.x), round(self.pos.y - self.height)
 
@@ -78,9 +73,8 @@ class Basketball(pygame.sprite.Sprite):
             if sprite != self and sprite != self.player
         ]
 
-
         if colliding_sprites:
-            self.ball_movement()
+            self.group.remove(self)
 
         if self.rect.left > 2100 or self.rect.left < 0 or self.rect.bottom < 0:
-            self.rect.left =-10
+            self.group.remove(self)
