@@ -45,6 +45,7 @@ class Player(pygame.sprite.Sprite):
         self.is_idle = False
         self.basketball = None
         self.team_bots = None
+        self.bot = None
         self.basketball_created = False
         self.scale_factor = 1.0
 
@@ -211,7 +212,8 @@ class Player(pygame.sprite.Sprite):
                     self.frame_index = 0
                     #make the ball go to the team_bot closest to you in the y coord
                     for bot in self.team_bots:
-                        if bot.selected_player == "melo":    
+                        if bot.selected_player == "melo":  
+                            self.bot = bot  
                             print(bot.position.x)
                             print(bot.position.y)
                     
@@ -452,7 +454,7 @@ class Player(pygame.sprite.Sprite):
                             (self.rect.midright[0] - 50, self.rect.midright[1] + 10),
                             self,
                             time,
-                            pygame.math.Vector2(1, 0),
+                            (self.bot.position - self.position).normalize(),
                         )
 
                     elif self.status == "left":
@@ -460,7 +462,7 @@ class Player(pygame.sprite.Sprite):
                             (self.rect.midleft[0] + 50, self.rect.midleft[1] + 10),
                             self,
                             time,
-                            pygame.math.Vector2(-1, 0),
+                            (self.bot.position - self.position).normalize(),
                         )
 
                     self.passing = False
