@@ -55,7 +55,7 @@ class Game:
         self.team = "knicks"
         self.selected_player = "brunson"
         self.winner = None
-        self.ball = False
+        self.ball = True
         self.bot = None
         self.team_bots_created = False
         self.opp_bots_created = False
@@ -318,6 +318,8 @@ class Game:
                         )
                     )
             self.team_bots_created = True
+            self.player.team_bots = self.team_bots
+             
 
     def spawn_opp_bots(self):
         if not self.opp_bots_created:

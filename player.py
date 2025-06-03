@@ -4,7 +4,7 @@ from basketball import Basketball
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, groups):
+    def __init__(self, pos, groups,):
         super().__init__(groups)
         self.group = groups
         self.WINDOW_WIDTH, self.WINDOW_HEIGHT = 1215, 812
@@ -44,6 +44,7 @@ class Player(pygame.sprite.Sprite):
         self.before_jump = None
         self.is_idle = False
         self.basketball = None
+        self.team_bots = None
         self.basketball_created = False
         self.scale_factor = 1.0
 
@@ -93,7 +94,7 @@ class Player(pygame.sprite.Sprite):
         if self.winner:
             if self.team == "knicks":
                 team = "knicks"
-                player = self.selected_player
+                player = self.selected_playerteam_ball
             else:
                 team = "lakers"
                 player = self.selected_player
@@ -208,6 +209,12 @@ class Player(pygame.sprite.Sprite):
                 if event.key == pygame.K_d and not self.passing and self.ball:
                     self.passing = True
                     self.frame_index = 0
+                    #make the ball go to the team_bot closest to you in the y coord
+                    for bot in self.team_bots:
+                        if bot.selected_player == "melo":    
+                            print(bot.position.x)
+                            print(bot.position.y)
+                    
                 elif event.key == pygame.K_d and not self.steal and not self.ball:
                     self.steal = True
                     self.frame_index = 0
