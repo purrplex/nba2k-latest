@@ -217,6 +217,7 @@ class Player(pygame.sprite.Sprite):
                             print(bot.position.x)
                             print(bot.position.y)
                             bot.ball = True
+                            self.ball = False
                     
                 elif event.key == pygame.K_d and not self.steal and not self.ball:
                     self.steal = True

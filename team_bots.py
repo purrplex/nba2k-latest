@@ -197,15 +197,17 @@ class TeamBots(pygame.sprite.Sprite):
 
     def face_player(self):
         distance, direction = self.get_player_distance_direction()
-
-        if distance < self.notice_radius:
-            if -0.95 < direction.y < 0.95:
-                if direction.x < 0:  # player to the left
-                    self.direction.x = -1
-                    self.status = "left"
-                elif direction.x > 0:  # player to the right
-                    self.direction.x = 1
-                    self.status = "right"
+        if not self.ball:
+            if distance < self.notice_radius:
+                if -0.95 < direction.y < 0.95:
+                    if direction.x < 0:  # player to the left
+                        self.direction.x = -1
+                        self.status = "left"
+                    elif direction.x > 0:  # player to the right
+                        self.direction.x = 1
+                        self.status = "right"
+        if self.ball == True:
+            self.status = "right"
 
     def move_to_position(self):
         """self.is_idle = True
