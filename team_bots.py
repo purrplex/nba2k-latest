@@ -400,7 +400,7 @@ class TeamBots(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.rect.center)
 
     def update(self, dt, screen, time, winner, ball):
-        self.ball = False
+        # self.ball = False
         self.winner = winner
         self.outOfBounds = True
         self.move(dt, screen, time)
