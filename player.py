@@ -36,6 +36,7 @@ class Player(pygame.sprite.Sprite):
         self.ball = None
         self.pass_steal = False
         self.passing = False
+        self.passselecting = None
         self.steal = False
         self.stealing = False
         self.landing = None
@@ -211,13 +212,14 @@ class Player(pygame.sprite.Sprite):
                     self.passing = True
                     self.frame_index = 0
                     #make the ball go to the team_bot closest to you in the y coord
-                    for bot in self.team_bots:
-                        if bot.selected_player == "melo":  
-                            self.bot = bot  
-                            print(bot.position.x)
-                            print(bot.position.y)
-                            bot.ball = True
-                            self.ball = False
+                    # for bot in self.team_bots:
+                    #     if bot.selected_player == "melo":  
+                    #         self.bot = bot  
+                    #         print(bot.position.x)
+                    #         print(bot.position.y)
+                    #         bot.ball = True
+                    #         self.ball = False
+                    self.passselecting = True
                     
                 elif event.key == pygame.K_d and not self.steal and not self.ball:
                     self.steal = True

@@ -47,7 +47,6 @@ def game_loop(self):
             self.spawn_team_bots()
             self.spawn_opp_bots()
 
-            self.bots_group.update(dt, self.screen, time, self.winner, self.ball)
 
             (
                 self.inbounder_is_active,
@@ -67,20 +66,24 @@ def game_loop(self):
                 self.show_qtr,
                 self.show_score,
             )
+            if self.player.passselecting == True:
+                self.show_passselectionscreen()
 
-            self.ball = self.testball.update(self.ball)
-            self.ball = self.testball2.update(self.ball)
+            else:
+                self.bots_group.update(dt, self.screen, time, self.winner, self.ball)
+                self.ball = self.testball.update(self.ball)
+                self.ball = self.testball2.update(self.ball)
 
-            self.outOfBounds, self.ball = self.player.update(
-                dt,
-                events,
-                self.screen,
-                time,
-                self.team,
-                self.winner,
-                self.ball,
-                self.selected_player,
-            )
+                self.outOfBounds, self.ball = self.player.update(
+                    dt,
+                    events,
+                    self.screen,
+                    time,
+                    self.team,
+                    self.winner,
+                    self.ball,
+                    self.selected_player,
+                )
 
         if self.outOfBounds:
             self.ball = False

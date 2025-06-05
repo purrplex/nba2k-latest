@@ -370,6 +370,14 @@ class Game:
         score_rect.midtop = (1050, 5)
         self.screen.blit(score_surface, score_rect)
 
+    def show_passselectionscreen(self):
+
+        my_font = pygame.font.Font("images/font.ttf", 45)
+        speed_surface = my_font.render("SELECT A PLAYER TO PASS TO", True, "yellow")
+        speed_rect = speed_surface.get_rect()
+        speed_rect.midtop = (320, 480)
+        self.screen.blit(speed_surface, speed_rect)    
+
     def show_startscreen(self):
 
         my_font = pygame.font.Font("images/font.ttf", 45)
