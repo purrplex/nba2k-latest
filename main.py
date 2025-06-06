@@ -1,5 +1,6 @@
 import pygame
 import time
+import math
 import random
 from player import Player
 from inbounder import Inbounder
@@ -73,6 +74,9 @@ class Game:
             "PRESS ENTER TO CONTINUE",
         ]
         self.continue_item = ["Continue", "Quit"]
+        
+        self.passselection_index = 0
+        self.passselection_time = 0
 
         self.player_menu_items = ""
         self.playerselectknicks_menu_items = ["brunson", "melo", "hart", "og", "kat"]
@@ -369,14 +373,76 @@ class Game:
         score_rect = score_surface.get_rect()
         score_rect.midtop = (1050, 5)
         self.screen.blit(score_surface, score_rect)
+        
+    def draw_passselection_arrow(self, bot):
+        pos_x = bot.position[0] - self.all_sprites_group.offset.x
+        pos_y = bot.position[1] - 50 + math.cos(self.passselection_time * 10) * 10
+        
+        #pygame.draw.rect(self.screen, (0,255,0), pos)
+        scale = bot.scale_factor
+        outline_scale = scale * 1.5
+        offset = 62 * (outline_scale - scale)
+        
+        arrow_points = [
+            (pos_x, pos_y - (50 * outline_scale) + offset),
+            (pos_x - (15 * outline_scale), pos_y - (70 * outline_scale) + offset),
+            (pos_x + (15 * outline_scale), pos_y - (70 * outline_scale) + offset),
+        ]
 
-    def show_passselectionscreen(self):
+        pygame.draw.polygon(self.screen, "black", arrow_points)
+        
+        arrow_points = [
+            (pos_x, pos_y - (50 * scale)),
+            (pos_x - (15 * scale), pos_y - (70 * scale)),
+            (pos_x + (15 * scale), pos_y - (70 * scale)),
+        ]
+
+        pygame.draw.polygon(self.screen, "red", arrow_points)
+
+    def get_passselect_bot(self, dt, events):
+        self.passselection_time += dt
+                    
+        team_bots = []
+        for bot in self.team_bots:
+            if self.player == bot:
+                continue
+            if bot.position.x < self.player.position.x + self.WINDOW_WIDTH/2 + 50:
+                team_bots.append(bot)
+                
+        team_bots.sort(key=lambda bot_instance: bot_instance.position.x)
+                
+        if len(team_bots) == 0:
+            self.passselection_index = 0
+            self.player.pass_selection = False
+            return None
+                
+        for event in events:
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    self.passselection_index = (self.passselection_index - 1) % len(team_bots)
+                if event.key == pygame.K_RIGHT:
+                    self.passselection_index = (self.passselection_index + 1) % len(team_bots)
+                if event.key == pygame.K_SPACE:
+                    self.player.bot = team_bots[self.passselection_index]
+                    self.passselection_index = 0
+                    self.player.passselecting = False
+                    
+        return team_bots[self.passselection_index]
+
+    def show_passselectionscreen(self, dt, events):
 
         my_font = pygame.font.Font("images/font.ttf", 65)
         speed_surface = my_font.render("SELECT A PLAYER TO PASS TO", True, "yellow")
         speed_rect = speed_surface.get_rect()
         speed_rect.midtop = (620, 100)
-        self.screen.blit(speed_surface, speed_rect)    
+        self.screen.blit(speed_surface, speed_rect)
+        
+        bot = self.get_passselect_bot(dt, events)
+        if bot:
+            self.draw_passselection_arrow(bot)
 
     def show_startscreen(self):
 
