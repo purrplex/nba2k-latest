@@ -425,6 +425,8 @@ class Game:
                     self.passselection_index = (self.passselection_index - 1) % len(team_bots)
                 if event.key == pygame.K_RIGHT:
                     self.passselection_index = (self.passselection_index + 1) % len(team_bots)
+                if event.key == pygame.K_TAB:
+                    self.passselection_index = (self.passselection_index + 1) % len(team_bots)
                 if event.key == pygame.K_SPACE:
                     self.player.bot = team_bots[self.passselection_index]
                     self.passselection_index = 0
