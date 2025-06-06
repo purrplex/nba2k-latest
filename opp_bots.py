@@ -210,8 +210,6 @@ class OppBots(pygame.sprite.Sprite):
         if self.speed > self.min_speed:
             self.speed -= self.speed_decay * dt
 
-        if self.direction.magnitude() > 0:
-            print(self.direction)
         # Update position
         self.position += self.direction * self.speed * dt
         if self.height != 0:
