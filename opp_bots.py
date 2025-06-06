@@ -1,5 +1,6 @@
 import pygame
 from pygame.math import Vector2 as vector
+import random
 
 
 class OppBots(pygame.sprite.Sprite):
@@ -29,6 +30,10 @@ class OppBots(pygame.sprite.Sprite):
         self.jump_speed = 400
         self.jump_start = 1
         self.gravity = -800
+        
+        self.delay_move_timer = 0
+        self.delay_move = False
+        self.delay = 0.2
 
         self.speed = 200
         self.max_speed = 500
@@ -174,13 +179,15 @@ class OppBots(pygame.sprite.Sprite):
                     self.direction.x = 1
                     self.status = "right"
 
-    def move_to_player(self):
+    def move_to_player(self, dt):
         distance, direction = self.get_player_distance_direction()
         if self.guard_radius < distance < self.move_radius:
             self.is_idle = False
             self.direction = direction
             self.speed += 1
         else:
+            self.delay_move = True
+            self.delay_move_timer = 0
             self.is_idle = True
             self.speed = 0
             self.direction = vector(0, 0)
@@ -189,13 +196,22 @@ class OppBots(pygame.sprite.Sprite):
         if self.direction.magnitude() != 0:
             self.direction = self.direction.normalize()
 
-        self.face_player()
-        self.move_to_player()
+        if self.delay_move:
+            self.delay_move_timer += dt
+            if self.delay_move_timer > self.delay:
+                self.delay = random.random()*0.1 + 0.1
+                self.delay_move_timer = 0
+                self.delay_move = False
+        else:
+            self.face_player()
+            self.move_to_player(dt)
 
         # Gradually decrease speed
         if self.speed > self.min_speed:
             self.speed -= self.speed_decay * dt
 
+        if self.direction.magnitude() > 0:
+            print(self.direction)
         # Update position
         self.position += self.direction * self.speed * dt
         if self.height != 0:
