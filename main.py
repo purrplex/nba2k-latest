@@ -413,7 +413,7 @@ class Game:
                 
         if len(team_bots) == 0:
             self.passselection_index = 0
-            self.player.pass_selection = False
+            self.player.passselecting = False
             return None
                 
         for event in events:
