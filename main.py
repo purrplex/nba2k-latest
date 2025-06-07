@@ -61,6 +61,7 @@ class Game:
         self.opp_bots_created = False
 
         # Menu variables
+        self.passto_selected_index = 0
         self.selected_index3 = None
         self.team_selected_index = 0
         self.player_selected_index = 0
@@ -370,13 +371,34 @@ class Game:
         score_rect.midtop = (1050, 5)
         self.screen.blit(score_surface, score_rect)
 
-    def show_passselectionscreen(self):
+    def show_passselectionscreenlogic(self, events):
+        for event in events:
+               
+            if event.type == pygame.KEYDOWN:
+                
+                self.highlight_sound.play()
+                if event.key == pygame.K_LEFT:
+                    self.highlight_sound.play()
+                    self.passto_selected_index = (self.passto_selected_index - 1) % len(
+                        self.team_bots
+                    )
+                elif event.key == pygame.K_RIGHT:
+                    self.highlight_sound.play()
+                    self.passto_selected_index = (self.passto_selected_index + 1) % len(
+                        self.team_bots
+                    )
 
+                # elif event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
+
+
+    def show_passselectionscreen(self, events):
+    
         my_font = pygame.font.Font("images/font.ttf", 65)
         speed_surface = my_font.render("SELECT A PLAYER TO PASS TO", True, "yellow")
         speed_rect = speed_surface.get_rect()
         speed_rect.midtop = (620, 100)
         self.screen.blit(speed_surface, speed_rect)    
+        self.show_passselectionscreenlogic(events)
 
     def show_startscreen(self):
 

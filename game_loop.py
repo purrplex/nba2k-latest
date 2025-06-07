@@ -67,7 +67,7 @@ def game_loop(self):
                 self.show_score,
             )
             if self.player.passselecting == True:
-                self.show_passselectionscreen()
+                self.show_passselectionscreen(events)
 
             else:
                 self.bots_group.update(dt, self.screen, time, self.winner, self.ball)
