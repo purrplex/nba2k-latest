@@ -382,13 +382,19 @@ class Game:
                     self.passto_selected_index = (self.passto_selected_index - 1) % len(
                         self.team_bots
                     )
+
                 elif event.key == pygame.K_RIGHT:
                     self.highlight_sound.play()
                     self.passto_selected_index = (self.passto_selected_index + 1) % len(
                         self.team_bots
                     )
 
-                # elif event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
+        bot = self.team_bots[self.passto_selected_index]
+        pos_x = bot.position[0] - self.all_sprites_group.offset.x
+        pos_y = bot.position[1] - 120
+        pygame.draw.circle(self.screen, "Green", (pos_x, pos_y), 15)
+
+    
 
 
     def show_passselectionscreen(self, events):
