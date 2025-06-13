@@ -16,7 +16,8 @@ class Player(pygame.sprite.Sprite):
         self.position = pygame.math.Vector2(pos)
         self.rect = None
         self.selected_player = "brunson"
-
+        self.dttimer = 0
+        self.shootpower = 0
         self.import_assets()
         self.animation = self.animations["idle"]
         self.image = self.animation[self.frame_index]
@@ -33,6 +34,7 @@ class Player(pygame.sprite.Sprite):
         self.min_speed = 200
         self.speed_decay = 100
 
+        self.shoottimer = False
         self.ball = None
         self.pass_steal = False
         self.passing = False
@@ -193,13 +195,10 @@ class Player(pygame.sprite.Sprite):
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
-    def input(self, events):
+    def input(self, events, dt):
         for event in events:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    self.speed += 50
-
-                if event.key == pygame.K_w and self.height == 0:
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_w and self.height == 0:    
                     self.jump_sound.play()
                     self.velocity = self.jump_speed
                     self.height = self.jump_start
@@ -207,6 +206,15 @@ class Player(pygame.sprite.Sprite):
                     self.basketball_created = False
                     self.frame_index = 0
                     self.direction = pygame.math.Vector2(0, 0)
+                    power = min(self.dttimer, 2.5) / 2.5
+                    self.shootpower = power * 5
+                    
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    self.speed += 50
+
+                if event.key == pygame.K_w and self.height == 0:
+                    self.shoottimer = True          
 
                 if event.key == pygame.K_d and not self.passing and self.ball:
                     self.passing = True
@@ -234,6 +242,8 @@ class Player(pygame.sprite.Sprite):
                     self.frame_index = 0
 
         keys = pygame.key.get_pressed()
+        if self.shoottimer == True:
+            self.dttimer += dt    
 
         if not self.ball:
             # Reset direction
@@ -439,6 +449,7 @@ class Player(pygame.sprite.Sprite):
                                 self,
                                 time,
                                 pygame.math.Vector2(1, 0),
+                                self.shootpower
                             )
 
                         elif self.status == "left":
@@ -447,6 +458,7 @@ class Player(pygame.sprite.Sprite):
                                 self,
                                 time,
                                 pygame.math.Vector2(-1, 0),
+                                self.shootpower
                             )
                     self.basketball_created = True
 
@@ -480,11 +492,12 @@ class Player(pygame.sprite.Sprite):
             self.team = team
             self.selected_player = selected_player
             self.import_assets()
+            
 
         self.ball = ball
         self.winner = winner
+        self.input(events, dt)
         self.outOfBounds = False
-        self.input(events)
         self.move(dt, screen, time)
         self.move_basketball(dt)
         self.animate(dt)

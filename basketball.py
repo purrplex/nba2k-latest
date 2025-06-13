@@ -20,7 +20,7 @@ import pygame
 
 
 class Basketball(pygame.sprite.Sprite):
-    def __init__(self, pos, player, time, direction):
+    def __init__(self, pos, player, time, direction, shootpower = 1):
         super().__init__(player.group)
 
         self.player = player
@@ -29,6 +29,7 @@ class Basketball(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=pos)
         self.pos = pygame.math.Vector2(self.rect.midleft)
         self.direction = direction
+        self.shootpower = shootpower
 
         self.group = player.group[0]
 
@@ -51,7 +52,7 @@ class Basketball(pygame.sprite.Sprite):
         self.scale_factor = 1.0
 
     def update(self, dt):
-        self.pos += self.direction * self.speed * dt
+        self.pos += self.direction * self.speed * dt * self.shootpower
         self.rect.topleft = (round(self.pos.x), round(self.pos.y))
 
         self.scale_factor = self.player.scale_factor

@@ -395,8 +395,6 @@ class Game:
         pygame.draw.circle(self.screen, "Green", (pos_x, pos_y), 15)
 
     
-
-
     def show_passselectionscreen(self, events):
     
         my_font = pygame.font.Font("images/font.ttf", 65)
