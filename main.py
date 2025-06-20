@@ -390,6 +390,7 @@ class Game:
                     )
                 elif event.key == pygame.K_RETURN or event.key == pygame.K_SPACE: 
                     bot = self.team_bots[self.passto_selected_index]
+                    self.player.bot = bot
                     print(bot.position.x)
                     print(bot.position.y)
                     bot.ball = True
