@@ -386,8 +386,15 @@ class Game:
                 elif event.key == pygame.K_RIGHT:
                     self.highlight_sound.play()
                     self.passto_selected_index = (self.passto_selected_index + 1) % len(
-                        self.team_bots
+                        self.team_bots 
                     )
+                elif event.key == pygame.K_RETURN or event.key == pygame.K_SPACE: 
+                    bot = self.team_bots[self.passto_selected_index]
+                    print(bot.position.x)
+                    print(bot.position.y)
+                    bot.ball = True
+                    self.player.ball = False
+                    self.player.passselecting = False
 
         bot = self.team_bots[self.passto_selected_index]
         pos_x = bot.position[0] - self.all_sprites_group.offset.x

@@ -219,14 +219,6 @@ class Player(pygame.sprite.Sprite):
                 if event.key == pygame.K_d and not self.passing and self.ball:
                     self.passing = True
                     self.frame_index = 0
-                    #make the ball go to the team_bot closest to you in the y coord
-                    # for bot in self.team_bots:
-                    #     if bot.selected_player == "melo":  
-                    #         self.bot = bot  
-                    #         print(bot.position.x)
-                    #         print(bot.position.y)
-                    #         bot.ball = True
-                    #         self.ball = False
                     self.passselecting = True
                     
                 elif event.key == pygame.K_d and not self.steal and not self.ball:
