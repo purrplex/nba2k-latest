@@ -208,6 +208,8 @@ class Player(pygame.sprite.Sprite):
                     self.direction = pygame.math.Vector2(0, 0)
                     power = min(self.dttimer, 2.5) / 2.5
                     self.shootpower = power * 5
+                    self.dttimer = 0
+                    self.shoottimer = False
                     
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
@@ -408,7 +410,7 @@ class Player(pygame.sprite.Sprite):
         bar_y = 20
         pygame.draw.rect(screen, (255, 255, 255), (bar_x, bar_y, bar_width, bar_height))
 
-        # Calculate the width of the green bar based on the player's speed
+        # Calculate the width of the green bar based on the player's speed 
         green_bar_width = int(
             (self.speed - self.min_speed)
             / (self.max_speed - self.min_speed)
@@ -422,6 +424,27 @@ class Player(pygame.sprite.Sprite):
         speed_surface = my_font.render("SPEED:", True, pygame.Color(255, 255, 255))
         speed_rect = speed_surface.get_rect()
         speed_rect.midtop = (100, 10)
+        screen.blit(speed_surface, speed_rect)
+            
+            
+    def draw_shoot_meter(self, screen):
+        bar_width = 200
+        bar_height = 20
+        bar_x = 170
+        bar_y = 50
+        pygame.draw.rect(screen, (255, 255, 255), (bar_x, bar_y, bar_width, bar_height))
+
+        # Calculate the width of the green bar based on the player's shot 
+        green_bar_width = min(self.dttimer, 2.5) / 2.5 * bar_width
+        
+
+        pygame.draw.rect(
+            screen, (0, 255, 0), (bar_x, bar_y, green_bar_width, bar_height)
+        )
+        my_font = pygame.font.Font("images/font.ttf", 50)
+        speed_surface = my_font.render("SHOOT:", True, pygame.Color(255, 255, 255))
+        speed_rect = speed_surface.get_rect()
+        speed_rect.midtop = (100, 30)
         screen.blit(speed_surface, speed_rect)
 
     def move_basketball(self, dt):
@@ -485,6 +508,9 @@ class Player(pygame.sprite.Sprite):
             self.selected_player = selected_player
             self.import_assets()
             
+
+        if self.shoottimer == True:
+            self.draw_shoot_meter(screen)
 
         self.ball = ball
         self.winner = winner
