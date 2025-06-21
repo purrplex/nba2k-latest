@@ -235,6 +235,16 @@ class Game:
         self.transparent_background = Background().generate_background()
 
     # Functions
+
+    def show_niceshot():
+        
+        my_font = pygame.font.Font("images/font.ttf", 30)
+        speed_surface = my_font.render("NICE SHOT", True, "green")
+        speed_rect = speed_surface.get_rect()
+        speed_rect.midtop = (320, 515)
+        # self.screen.blit(speed_surface, speed_rect)
+
+
     def player_select(self):
         dt = self.clock.tick() / 1000
 
@@ -370,6 +380,7 @@ class Game:
         score_rect = score_surface.get_rect()
         score_rect.midtop = (1050, 5)
         self.screen.blit(score_surface, score_rect)
+
 
     def show_passselectionscreenlogic(self, events):
         for event in events:
