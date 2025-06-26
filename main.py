@@ -237,14 +237,13 @@ class Game:
 
     # Functions
 
-    def show_niceshot():
+    def show_niceshot(self):
         
         my_font = pygame.font.Font("images/font.ttf", 30)
         speed_surface = my_font.render("NICE SHOT", True, "green")
         speed_rect = speed_surface.get_rect()
         speed_rect.midtop = (320, 515)
-        # self.screen.blit(speed_surface, speed_rect)
-
+        self.screen.blit(speed_surface, speed_rect)
 
     def player_select(self):
         dt = self.clock.tick() / 1000

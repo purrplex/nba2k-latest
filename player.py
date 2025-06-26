@@ -34,6 +34,7 @@ class Player(pygame.sprite.Sprite):
         self.min_speed = 200
         self.speed_decay = 100
 
+        self.shooting = False
         self.shoottimer = False
         self.ball = None
         self.pass_steal = False
@@ -210,13 +211,15 @@ class Player(pygame.sprite.Sprite):
                     self.shootpower = power * 5
                     self.dttimer = 0
                     self.shoottimer = False
+                    self.shooting = False
                     
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     self.speed += 50
 
                 if event.key == pygame.K_w and self.height == 0:
-                    self.shoottimer = True          
+                    self.shoottimer = True   
+                    self.shooting = True    
 
                 if event.key == pygame.K_d and not self.passing and self.ball:
                     self.passing = True

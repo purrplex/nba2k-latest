@@ -86,6 +86,9 @@ def game_loop(self):
                     self.selected_player,
                 )
 
+        if self.player.shooting == True:
+            self.show_niceshot()
+
         if self.outOfBounds:
             self.ball = False
             self.snap = False
