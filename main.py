@@ -59,7 +59,7 @@ class Game:
         self.bot = None
         self.team_bots_created = False
         self.opp_bots_created = False
-        self.hoop_coords = (1350, 330)
+        self.hoop_coords = pygame.math.Vector2(1850, 350)
 
         # Menu variables
         self.passto_selected_index = 0

@@ -211,7 +211,7 @@ class Player(pygame.sprite.Sprite):
                     self.shootpower = power * 5
                     self.dttimer = 0
                     self.shoottimer = False
-                    self.shooting = False
+                    # self.shooting = False
                     
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
