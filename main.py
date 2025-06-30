@@ -60,8 +60,8 @@ class Game:
         self.team_bots_created = False
         self.opp_bots_created = False
         self.hoop_coords = pygame.math.Vector2(1850, 350)
-        self.hoop_rect = pygame.Rect(1805, 315, 90, 60)
         self.niceshot_timer = 0
+        self.niceshot_timer_dur = 2
 
         # Menu variables
         self.passto_selected_index = 0
@@ -240,10 +240,11 @@ class Game:
     # Functions
 
     def show_niceshot(self, dt):
-        if self.niceshot_timer < 0:
+        if self.niceshot_timer <= 0:
             return
         self.niceshot_timer -= dt
-        my_font = pygame.font.Font("images/font.ttf", 100)
+        frac_complete = self.niceshot_timer / self.niceshot_timer_dur
+        my_font = pygame.font.Font("images/font.ttf", int(100 * frac_complete))
         speed_surface = my_font.render("NICE SHOT", True, "green")
         speed_rect = speed_surface.get_rect()
         speed_rect.midtop = (750, 100)

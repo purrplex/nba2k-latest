@@ -47,17 +47,19 @@ class Basketball(pygame.sprite.Sprite):
         self.gravity = -800
         
         self.scored = False
+        self.done = False
 
         self.velocity = self.jump_speed
         self.height = self.jump_start
 
-        self.scale_factor = 1.0
+        self.scale_factor = self.player.scale_factor
 
     def update(self, dt):
+        if self.done or self.scored:
+            self.group.remove(self)
+            return
         self.pos += self.direction * self.speed * dt * self.shootpower
         self.rect.topleft = (round(self.pos.x), round(self.pos.y))
-
-        self.scale_factor = self.player.scale_factor
 
         if self.player.height != 0:
             self.shooting = True
@@ -66,11 +68,11 @@ class Basketball(pygame.sprite.Sprite):
             if self.height != 0:
                 self.velocity += self.gravity * dt
                 self.height += self.velocity * dt
-                if self.height < 0:
-                    self.height = 0
+                if self.height < -250 * self.scale_factor:
+                    self.height = -250 * self.scale_factor
                     self.velocity = 0
                     self.shooting = False
-                    self.kill()
+                    self.done = True
 
         self.rect.center = round(self.pos.x), round(self.pos.y - self.height)
 
@@ -94,9 +96,9 @@ class Basketball(pygame.sprite.Sprite):
             if sprite != self and sprite != self.player
         ]
 
-        if colliding_sprites:
-            self.group.remove(self)
+        if not self.shooting and colliding_sprites:
+            self.done = True
 
         if self.rect.left > 2100 or self.rect.left < 0 or self.rect.bottom < 0:
-            self.group.remove(self)
+            self.done = True
 
