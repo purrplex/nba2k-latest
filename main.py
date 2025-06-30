@@ -239,10 +239,10 @@ class Game:
 
     def show_niceshot(self):
         
-        my_font = pygame.font.Font("images/font.ttf", 30)
+        my_font = pygame.font.Font("images/font.ttf", 100)
         speed_surface = my_font.render("NICE SHOT", True, "green")
         speed_rect = speed_surface.get_rect()
-        speed_rect.midtop = (320, 515)
+        speed_rect.midtop = (750, 100)
         self.screen.blit(speed_surface, speed_rect)
 
     def player_select(self):
