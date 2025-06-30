@@ -37,6 +37,7 @@ class Basketball(pygame.sprite.Sprite):
         self.time = time
         self.menu = False
         self.collision_state = None
+        self.backboard_right = pygame.Rect(1925, 210, 10, 150)
 
         self.shooting = False
 
@@ -65,6 +66,9 @@ class Basketball(pygame.sprite.Sprite):
             self.shooting = True
 
         if self.shooting:
+            if self.rect.colliderect(self.backboard_right):
+                self.pos.x -= 1
+                self.direction.x *= -.8
             if self.height != 0:
                 self.velocity += self.gravity * dt
                 self.height += self.velocity * dt
