@@ -45,6 +45,8 @@ class Basketball(pygame.sprite.Sprite):
         self.jump_speed = 400
         self.jump_start = 1
         self.gravity = -800
+        
+        self.scored = False
 
         self.velocity = self.jump_speed
         self.height = self.jump_start
@@ -97,3 +99,4 @@ class Basketball(pygame.sprite.Sprite):
 
         if self.rect.left > 2100 or self.rect.left < 0 or self.rect.bottom < 0:
             self.group.remove(self)
+

@@ -86,9 +86,12 @@ def game_loop(self):
                     self.selected_player,
                 )
         if self.player.basketball:
-            if (self.player.basketball.pos - self.hoop_coords).magnitude() < 300:
+            if not self.player.basketball.scored and self.hoop_rect.colliderect(self.player.basketball.rect):
+                self.player.basketball.scored = True
                 self.score[0] += 1
-                self.show_niceshot()
+                self.niceshot_timer = 2
+                
+        self.show_niceshot(dt)
 
         if self.outOfBounds:
             self.ball = False
@@ -96,3 +99,4 @@ def game_loop(self):
             self.qtr += 1
 
         pygame.display.update()
+
