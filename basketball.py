@@ -37,6 +37,7 @@ class Basketball(pygame.sprite.Sprite):
         self.time = time
         self.menu = False
         self.collision_state = None
+        self.backboard_right = pygame.Rect(1925, 210, 10, 150)
 
         self.shooting = False
 
@@ -45,31 +46,41 @@ class Basketball(pygame.sprite.Sprite):
         self.jump_speed = 400
         self.jump_start = 1
         self.gravity = -800
+        
+        self.scored = False
+        self.done = False
 
         self.velocity = self.jump_speed
         self.height = self.jump_start
 
-        self.scale_factor = 1.0
+        self.scale_factor = self.player.scale_factor
 
     def update(self, dt):
+        if self.done or self.scored:
+            self.group.remove(self)
+            return
         self.pos += self.direction * self.speed * dt * self.shootpower
         self.rect.topleft = (round(self.pos.x), round(self.pos.y))
-
-        self.scale_factor = self.player.scale_factor
 
         if self.player.height != 0:
             self.shooting = True
 
         if self.shooting:
+            if self.rect.colliderect(self.backboard_right):
+                self.pos.x -= 1
+                self.direction.x *= -.8
             if self.height != 0:
                 self.velocity += self.gravity * dt
                 self.height += self.velocity * dt
-                if self.height < 0:
-                    self.height = 0
+                if self.height < -250 * self.scale_factor:
+                    self.height = -250 * self.scale_factor
                     self.velocity = 0
                     self.upthescore = True
                     self.shooting = False
+
+                    self.done = True
                     self.group.remove(self)
+
 
         self.rect.center = round(self.pos.x), round(self.pos.y - self.height)
 
@@ -93,8 +104,9 @@ class Basketball(pygame.sprite.Sprite):
             if sprite != self and sprite != self.player
         ]
 
-        if colliding_sprites:
-            self.group.remove(self)
+        if not self.shooting and colliding_sprites:
+            self.done = True
 
         if self.rect.left > 2100 or self.rect.left < 0 or self.rect.bottom < 0:
-            self.group.remove(self)
+            self.done = True
+

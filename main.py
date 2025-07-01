@@ -1,6 +1,7 @@
 import pygame
 import time
 import random
+import math
 from player import Player
 from inbounder import Inbounder
 from player_select import PlayerSelect
@@ -61,6 +62,8 @@ class Game:
         self.team_bots_created = False
         self.opp_bots_created = False
         self.hoop_coords = pygame.math.Vector2(1850, 350)
+        self.niceshot_timer = 0
+        self.niceshot_timer_dur = 1
 
         # Menu variables
         self.passto_selected_index = 0
@@ -238,9 +241,13 @@ class Game:
 
     # Functions
 
-    def show_niceshot(self):
-        
-        my_font = pygame.font.Font("images/font.ttf", 100)
+    def show_niceshot(self, dt):
+        if self.niceshot_timer <= 0:
+            return
+        self.niceshot_timer -= dt
+        frac = self.niceshot_timer / self.niceshot_timer_dur
+        easing = math.cos((frac**10 - 0.23)*math.pi) * 0.5 + 0.5
+        my_font = pygame.font.Font("images/font.ttf", int(100 * easing))
         speed_surface = my_font.render("NICE SHOT", True, "green")
         speed_rect = speed_surface.get_rect()
         speed_rect.midtop = (750, 100)
@@ -548,3 +555,4 @@ class Game:
 if __name__ == "__main__":
     game = Game()
     game.run()
+

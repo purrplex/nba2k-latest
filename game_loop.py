@@ -86,6 +86,16 @@ def game_loop(self):
                     self.selected_player,
                 )
         if self.player.basketball:
+
+            ball_pos = self.player.basketball.pos.copy()
+            ball_pos.y -= self.player.basketball.height
+            if not self.player.basketball.scored and (self.hoop_coords - ball_pos).magnitude() < 40:
+                self.player.basketball.scored = True
+                self.score[0] += 1
+                self.niceshot_timer = self.niceshot_timer_dur
+                
+        self.show_niceshot(dt)
+
             if (self.upthescore and (self.player.basketball.pos - self.hoop_coords).magnitude() < 100):
                 self.upthescore = False
                 self.score[0] += 1
@@ -93,9 +103,11 @@ def game_loop(self):
             if (self.player.basketball.pos - self.hoop_coords).magnitude() < 100:
                 self.show_niceshot()
 
+
         if self.outOfBounds:
             self.ball = False
             self.snap = False
             self.qtr += 1
 
         pygame.display.update()
+
