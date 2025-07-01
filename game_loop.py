@@ -96,14 +96,6 @@ def game_loop(self):
                 
         self.show_niceshot(dt)
 
-            if (self.upthescore and (self.player.basketball.pos - self.hoop_coords).magnitude() < 100):
-                self.upthescore = False
-                self.score[0] += 1
-
-            if (self.player.basketball.pos - self.hoop_coords).magnitude() < 100:
-                self.show_niceshot()
-
-
         if self.outOfBounds:
             self.ball = False
             self.snap = False
