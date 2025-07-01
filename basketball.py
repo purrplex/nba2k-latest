@@ -75,8 +75,12 @@ class Basketball(pygame.sprite.Sprite):
                 if self.height < -250 * self.scale_factor:
                     self.height = -250 * self.scale_factor
                     self.velocity = 0
+                    self.upthescore = True
                     self.shooting = False
+
                     self.done = True
+                    self.group.remove(self)
+
 
         self.rect.center = round(self.pos.x), round(self.pos.y - self.height)
 

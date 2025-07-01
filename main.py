@@ -48,6 +48,7 @@ class Game:
         self.player_select_group = pygame.sprite.Group()
 
         # variables
+        self.upthescore = True
         self.outOfBounds = False
         self.outOfBounds2 = False
         self.inbounder_is_active = True
