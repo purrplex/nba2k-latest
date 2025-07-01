@@ -22,6 +22,7 @@ class Player(pygame.sprite.Sprite):
         self.animation = self.animations["idle"]
         self.image = self.animation[self.frame_index]
         self.rect = self.image.get_rect(center=pos)
+        
 
         self.height = 0
         self.velocity = 0
@@ -34,6 +35,7 @@ class Player(pygame.sprite.Sprite):
         self.min_speed = 200
         self.speed_decay = 100
 
+        
         self.shooting = False
         self.shoottimer = False
         self.ball = None

@@ -86,8 +86,11 @@ def game_loop(self):
                     self.selected_player,
                 )
         if self.player.basketball:
-            if (self.player.basketball.pos - self.hoop_coords).magnitude() < 300:
+            if (self.upthescore and (self.player.basketball.pos - self.hoop_coords).magnitude() < 100):
+                self.upthescore = False
                 self.score[0] += 1
+
+            if (self.player.basketball.pos - self.hoop_coords).magnitude() < 100:
                 self.show_niceshot()
 
         if self.outOfBounds:
