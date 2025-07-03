@@ -71,29 +71,23 @@ def game_loop(self):
                 self.show_passselectionscreen(events)
 
             else:
-                self.bots_group.update(dt, self.screen, time, self.winner, self.ball)
+                self.bots_group.update(dt, self.screen, time, self.winner)
                 self.ball = self.testball.update(self.ball)
                 self.ball = self.testball2.update(self.ball)
 
-                self.outOfBounds, self.ball = self.player.update(
+                self.outOfBounds = self.player.update(
                     dt,
                     events,
                     self.screen,
                     time,
                     self.team,
                     self.winner,
-                    self.ball,
                     self.selected_player,
                 )
-        if self.player.basketball:
-
-            ball_pos = self.player.basketball.pos.copy()
-            ball_pos.y -= self.player.basketball.height
-            if not self.player.basketball.scored and (self.hoop_coords - ball_pos).magnitude() < 40:
-                self.player.basketball.scored = True
-                self.score[0] += 1
-                self.niceshot_timer = self.niceshot_timer_dur
                 
+        if self.basketball:
+            self.basketball.update(dt)
+            
         self.show_niceshot(dt)
 
         if self.outOfBounds:

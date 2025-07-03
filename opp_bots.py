@@ -1,4 +1,5 @@
 import pygame
+import random
 from pygame.math import Vector2 as vector
 
 
@@ -37,6 +38,7 @@ class OppBots(pygame.sprite.Sprite):
 
         self.stop = 0
         self.ball = None
+        self.steal = False
         self.pass_steal = False
         self.stealing = False
         self.landing = None
@@ -50,6 +52,10 @@ class OppBots(pygame.sprite.Sprite):
         self.notice_radius = 1000
         self.move_radius = 350
         self.guard_radius = 120
+        
+        self.delay_move_timer = 0
+        self.delay_move = False
+        self.delay = 0.2
 
         self.jump_sound = pygame.mixer.Sound("images/sounds/jump.wav")
         self.jump_sound.set_volume(0.05)
@@ -184,13 +190,22 @@ class OppBots(pygame.sprite.Sprite):
             self.is_idle = True
             self.speed = 0
             self.direction = vector(0, 0)
+            self.delay_move = True
+            self.delay_move_timer = 0
 
     def move(self, dt, screen, time):
         if self.direction.magnitude() != 0:
             self.direction = self.direction.normalize()
 
-        self.face_player()
-        self.move_to_player()
+        if self.delay_move:
+            self.delay_move_timer += dt
+            if self.delay_move_timer > self.delay:
+                self.delay = random.random()*0.1 + 0.1
+                self.delay_move_timer = 0
+                self.delay_move = False
+        else:
+            self.face_player()
+            self.move_to_player()
 
         # Gradually decrease speed
         if self.speed > self.min_speed:
@@ -231,6 +246,25 @@ class OppBots(pygame.sprite.Sprite):
             self.outofbounds(screen, time)
             self.reset_position()
             self.direction.y = 0"""
+        
+    def animation_done(self):
+        if self.steal:
+            self.steal = False
+            if self.player.ball:
+                self.player.ball = False
+                self.ball = True
+                
+        self.frame_index = len(self.animation) - 1
+        
+        if self.stop == 0:
+            self.stop += 1
+
+        if self.ball:
+            self.speed = 0
+        self.pass_steal = False
+        self.landing = False
+        self.flopping = False
+        self.falling = False
 
     def animate(self, dt):
         if self.height != 0:
@@ -276,7 +310,7 @@ class OppBots(pygame.sprite.Sprite):
                         self.animation = self.animations["idle"]
                         self.direction.x = 0
 
-                    if self.pass_steal:
+                    if self.steal:
                         self.animation = self.animations["steal"]
 
                     if self.flopping:
@@ -297,7 +331,7 @@ class OppBots(pygame.sprite.Sprite):
                         self.animation = self.animations["idle_left"]
                         self.direction.x = 0
 
-                    if self.pass_steal:
+                    if self.steal:
                         self.animation = self.animations["steal_left"]
 
                     if self.flopping:
@@ -329,21 +363,10 @@ class OppBots(pygame.sprite.Sprite):
         ]:
 
             if self.frame_index > len(self.animation) - 2:
-                self.frame_index = len(self.animation) - 1
-
-                if self.stop == 0:
-                    self.stop += 1
-
-                if self.ball:
-                    self.speed = 0
-                self.pass_steal = False
-                self.landing = False
-                self.flopping = False
-                self.falling = False
-
+                self.animation_done()
             else:
-                self.pass_steal = True
-                if self.ball or self.landing or self.pass_steal:
+                #self.steal = True
+                if self.ball or self.landing or self.steal:
                     self.speed = 0
                 else:
                     self.speed = self.speed
@@ -360,9 +383,12 @@ class OppBots(pygame.sprite.Sprite):
             self.animation[int(self.frame_index)], (new_width, new_height)
         )
         self.rect = self.image.get_rect(center=self.rect.center)
+        
+    def give_ball(self):
+        self.ball = True
+        self.basketball_created = False
 
-    def update(self, dt, screen, time, winner, ball):
-        self.ball = False
+    def update(self, dt, screen, time, winner):
         self.winner = winner
         self.outOfBounds = True
         self.move(dt, screen, time)
