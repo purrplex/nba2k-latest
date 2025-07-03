@@ -15,11 +15,13 @@ class TeamBots(pygame.sprite.Sprite):
         play_name,
         outOfBounds,
         target_pos,
+        create_basketball
     ):
         super().__init__(groups)
         self.group = groups
         self.player = player
         self.team = team
+        self.create_basketball = create_basketball
         self.play_name = play_name
         self.selected_player = selected_player
         self.WINDOW_WIDTH, self.WINDOW_HEIGHT = 1215, 812
@@ -56,13 +58,16 @@ class TeamBots(pygame.sprite.Sprite):
         self.ball = None
         self.pass_steal = False
         self.stealing = False
+        self.passing = False
         self.landing = None
         self.flopping = False
         self.falling = False
         self.before_jump = None
         self.is_idle = False
         self.basketball = None
+        self.basketball_created = False
         self.scale_factor = 1.0
+        self.hoop_xy = pygame.math.Vector2(1850,562)
 
         self.notice_radius = 1000
         self.move_radius = 850
@@ -197,7 +202,7 @@ class TeamBots(pygame.sprite.Sprite):
 
     def face_player(self):
         distance, direction = self.get_player_distance_direction()
-        if not self.ball:
+        if not self.ball or self.basketball_created:
             if distance < self.notice_radius:
                 if -0.95 < direction.y < 0.95:
                     if direction.x < 0:  # player to the left
@@ -217,6 +222,7 @@ class TeamBots(pygame.sprite.Sprite):
         distance, direction = self.get_position_distance_direction()
 
         if self.guard_radius < distance < self.move_radius:
+            
             self.is_idle = False
             self.direction = direction
             self.speed += 1
@@ -256,7 +262,6 @@ class TeamBots(pygame.sprite.Sprite):
         self.speed = max(self.min_speed, min(self.speed, self.max_speed))
 
         if self.landing:
-            self.ball = False
             self.pass_steal = False
 
         if self.position.x < 20:
@@ -271,11 +276,23 @@ class TeamBots(pygame.sprite.Sprite):
             self.outofbounds(screen, time)
             self.reset_position()
             self.direction.y = 0"""
+        
+    def animation_done(self):
+        self.frame_index = len(self.animation) - 1
+
+        if self.stop == 0:
+            self.stop += 1
+
+        if self.ball:
+            self.speed = 0
+        self.pass_steal = False
+        self.landing = False
+        self.flopping = False
+        self.falling = False
 
     def animate(self, dt):
         if self.height != 0:
-            if self.ball:
-
+            if self.ball or self.basketball_created:
                 if self.status == "right":
                     self.animation = self.animations["shoot"]
                 elif self.status == "left":
@@ -369,17 +386,7 @@ class TeamBots(pygame.sprite.Sprite):
         ]:
 
             if self.frame_index > len(self.animation) - 2:
-                self.frame_index = len(self.animation) - 1
-
-                if self.stop == 0:
-                    self.stop += 1
-
-                if self.ball:
-                    self.speed = 0
-                self.pass_steal = False
-                self.landing = False
-                self.flopping = False
-                self.falling = False
+                self.animation_done()
 
             else:
                 self.pass_steal = True
@@ -400,12 +407,62 @@ class TeamBots(pygame.sprite.Sprite):
             self.animation[int(self.frame_index)], (new_width, new_height)
         )
         self.rect = self.image.get_rect(center=self.rect.center)
+        
+    def release_ball(self, action, target=None):
+        shootpower = abs(self.position.x - self.WINDOW_WIDTH/2)
+        shootpower = 1 - (shootpower/self.WINDOW_WIDTH/2)
+        shootpower = shootpower**4*4
+        shootpower += random.random()*0.5
+        ball_data = {
+            'player':self,
+            'shootpower':shootpower,
+            'action':action
+        }
+        
+        if self.status == "right":
+            ball_data['pos'] = (self.rect.topright[0] - 50, self.rect.topright[1] + 10)
+            ball_data['direction'] = (self.hoop_xy - self.position).normalize()
+        elif self.status == "left":
+            ball_data['pos'] = (self.rect.topleft[0] + 50, self.rect.topleft[1] + 10)
+            ball_data['direction'] = (self.hoop_xy - self.position).normalize()
+            
+            
+        if action == "pass":
+            if target:
+                ball_data['direction'] = (self.bot.position - self.position).normalize()
+            
+        
+        self.create_basketball(ball_data)
+        self.basketball_created = True
+        self.ball = False
+        
+    def give_ball(self):
+        self.ball = True
+        self.basketball_created = False
 
-    def update(self, dt, screen, time, winner, ball):
-        # self.ball = False
+    def update_basketball(self, dt):
+        if not self.ball or self.basketball_created:
+            return
+        
+        if self.height == 0:
+            if random.random() > .99:
+                self.velocity = self.jump_speed
+                self.height = self.jump_start
+        
+        if self.height != 0:
+            if self.frame_index == len(self.animation) - 1:
+                self.release_ball("shoot")
+        elif self.passing:
+            if self.frame_index == len(self.animation) - 1:
+                self.release_ball("pass")
+                self.passing = False
+        
+
+    def update(self, dt, screen, time, winner):
         self.winner = winner
         self.outOfBounds = True
         self.move(dt, screen, time)
+        self.update_basketball(dt)
         self.animate(dt)
 
         return self.outOfBounds

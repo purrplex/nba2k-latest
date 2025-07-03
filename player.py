@@ -4,7 +4,7 @@ from basketball import Basketball
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, groups,):
+    def __init__(self, pos, groups, create_basketball):
         super().__init__(groups)
         self.group = groups
         self.WINDOW_WIDTH, self.WINDOW_HEIGHT = 1215, 812
@@ -17,11 +17,13 @@ class Player(pygame.sprite.Sprite):
         self.rect = None
         self.selected_player = "brunson"
         self.dttimer = 0
-        self.shootpower = 0
+        self.shootpower = 1
         self.import_assets()
         self.animation = self.animations["idle"]
         self.image = self.animation[self.frame_index]
         self.rect = self.image.get_rect(center=pos)
+        
+        self.create_basketball = create_basketball
         
 
         self.height = 0
@@ -54,6 +56,7 @@ class Player(pygame.sprite.Sprite):
         self.bot = None
         self.basketball_created = False
         self.scale_factor = 1.0
+        self.hoop_xy = pygame.math.Vector2(1850,562)
 
         self.jump_sound = pygame.mixer.Sound("images/sounds/jump.wav")
         self.jump_sound.set_volume(0.05)
@@ -178,7 +181,6 @@ class Player(pygame.sprite.Sprite):
         self.speed = max(self.min_speed, min(self.speed, self.max_speed))
 
         if self.landing:
-            self.ball = False
             self.passing = False
             self.steal = False
 
@@ -281,11 +283,29 @@ class Player(pygame.sprite.Sprite):
                     self.direction.y = -1
                 if keys[pygame.K_DOWN]:
                     self.direction.y = 1
+                    
+    def animation_done(self):
+        self.frame_index = len(self.animation) - 1
+        if self.ball and not self.basketball_created:
+            self.speed = 0
+            if self.height != 0:
+                self.release_ball("shoot")
+            elif self.passing:
+                self.release_ball("pass")
+                self.passing = False
+            self.basketball_created = True
+            self.ball = False
+        elif self.steal:
+            print('steal done')
+
+        self.steal = False
+        self.landing = False
+        self.flopping = False
+        self.falling = False
 
     def animate(self, dt):
         if self.height != 0:
-            if self.ball:
-
+            if self.ball or self.basketball_created:
                 if self.status == "right":
                     self.animation = self.animations["shoot"]
                 elif self.status == "left":
@@ -379,16 +399,7 @@ class Player(pygame.sprite.Sprite):
         ]:
 
             if self.frame_index > len(self.animation) - 2:
-                self.frame_index = len(self.animation) - 1
-
-                if self.ball:
-                    self.speed = 0
-
-                self.steal = False
-                self.landing = False
-                self.flopping = False
-                self.falling = False
-
+                self.animation_done()
             else:
                 if self.ball or self.landing or self.passing or self.steal:
                     self.speed = 0
@@ -451,63 +462,52 @@ class Player(pygame.sprite.Sprite):
         speed_rect = speed_surface.get_rect()
         speed_rect.midtop = (100, 30)
         screen.blit(speed_surface, speed_rect)
+        
+    def release_ball(self, action, target=None):
+        ball_data = {
+            'player':self,
+            'shootpower':self.shootpower,
+            'action':action
+        }
+        
+        if self.status == "right":
+            ball_data['pos'] = (self.rect.topright[0] - 50, self.rect.topright[1] + 10)
+            ball_data['direction'] = (self.hoop_xy - self.position).normalize()
+        elif self.status == "left":
+            ball_data['pos'] = (self.rect.topleft[0] + 50, self.rect.topleft[1] + 10)
+            ball_data['direction'] = (self.hoop_xy - self.position).normalize()
+            
+            
+        if action == "pass":
+            if target:
+                ball_data['direction'] = (self.bot.position - self.position).normalize()
+            
+        
+        self.create_basketball(ball_data)
+        self.basketball_created = True
+        #self.ball = False
+        
+    def give_ball(self):
+        self.ball = True
+        self.basketball_created = False
 
-    def move_basketball(self, dt):
-        if self.ball:
+    def update_basketball(self):
+        if not self.ball or self.basketball_created:
+            return
+        
+        if self.frame_index == len(self.animation) - 1:
+            self.speed = 0
             if self.height != 0:
-
-                if self.frame_index == len(self.animation) - 1:
-
-                    if self.basketball_created == False:
-
-                        if self.status == "right":
-                            self.basketball = Basketball(
-                                (
-                                    self.rect.topright[0] - 50,
-                                    self.rect.topright[1] + 10,
-                                ),
-                                self,
-                                time,
-                                pygame.math.Vector2(1, 0),
-                                self.shootpower
-                            )
-
-                        elif self.status == "left":
-                            self.basketball = Basketball(
-                                (self.rect.topleft[0] + 50, self.rect.topleft[1] + 10),
-                                self,
-                                time,
-                                pygame.math.Vector2(-1, 0),
-                                self.shootpower
-                            )
-                    self.basketball_created = True
-
+                self.release_ball("shoot")
             elif self.passing:
-                if self.frame_index == len(self.animation) - 1:
+                self.release_ball("pass")
+                self.passing = False
+            self.basketball_created = True
+            self.ball = False
+                
 
-                    if self.status == "right":
-                        self.basketball = Basketball(
-                            (self.rect.midright[0] - 50, self.rect.midright[1] + 10),
-                            self,
-                            time,
-                            (self.bot.position - self.position).normalize(),
-                        )
 
-                    elif self.status == "left":
-                        self.basketball = Basketball(
-                            (self.rect.midleft[0] + 50, self.rect.midleft[1] + 10),
-                            self,
-                            time,
-                            (self.bot.position - self.position).normalize(),
-                        )
-
-                    self.passing = False
-                    self.ball = False
-
-        if self.basketball:
-            self.basketball.update(dt)
-
-    def update(self, dt, events, screen, time, team, winner, ball, selected_player):
+    def update(self, dt, events, screen, time, team, winner, selected_player):
         if (self.team, self.selected_player) != (team, selected_player):
             self.team = team
             self.selected_player = selected_player
@@ -517,12 +517,11 @@ class Player(pygame.sprite.Sprite):
         if self.shoottimer == True:
             self.draw_shoot_meter(screen)
 
-        self.ball = ball
         self.winner = winner
         self.input(events, dt)
         self.outOfBounds = False
         self.move(dt, screen, time)
-        self.move_basketball(dt)
+        #self.update_basketball()
         self.animate(dt)
 
-        return (self.outOfBounds, self.ball)
+        return (self.outOfBounds)

@@ -8,6 +8,7 @@ from player_select import PlayerSelect
 from game_loop import game_loop
 from all_sprites import AllSprites
 from test_ball import TestBall
+from basketball import Basketball
 
 
 from menus import (
@@ -61,7 +62,6 @@ class Game:
         self.bot = None
         self.team_bots_created = False
         self.opp_bots_created = False
-        self.hoop_coords = pygame.math.Vector2(1850, 350)
         self.niceshot_timer = 0
         self.niceshot_timer_dur = 1
 
@@ -147,7 +147,7 @@ class Game:
         # Classes
         self.tipoff = TipOff()
 
-        self.player = Player((1100, 500), (self.all_sprites_group, self.player_group))
+        self.player = Player((1100, 500), (self.all_sprites_group, self.player_group), self.create_basketball)
         self.inbounder = Inbounder(
             (250, 350),
             self.inbounder_group,
@@ -157,6 +157,7 @@ class Game:
 
         self.team_bots = []
 
+        self.basketball = None
         self.testball = TestBall(
             (200, 700),
             (
@@ -238,8 +239,26 @@ class Game:
         # Load background (Tipoff)
         self.background = None
         self.transparent_background = Background().generate_background()
+        
+        self.ball_holder = self.player
 
     # Functions
+    
+    def basketball_scored(self, ball_data):
+        self.score[0] += ball_data.get('point_value', 1)
+        self.niceshot_timer = self.niceshot_timer_dur
+        
+    def basketball_done(self, pos, scored):
+        self.basketball = None
+        
+        #random.choice(self.team_bots).give_ball()
+        
+    def create_basketball(self, data):
+        self.score[1] += 1
+        data['score'] = self.basketball_scored
+        data['remove'] = self.basketball_done
+        self.basketball = Basketball(data)
+        #data['player'].ball = False
 
     def show_niceshot(self, dt):
         if self.niceshot_timer <= 0:
@@ -334,6 +353,7 @@ class Game:
                             play_name,
                             self.outOfBounds,
                             target_pos,
+                            self.create_basketball
                         )
                     )
             self.team_bots_created = True
@@ -391,32 +411,34 @@ class Game:
 
 
     def show_passselectionscreenlogic(self, events):
-        for event in events:
-               
+        inc = 1
+        for event in events:   
             if event.type == pygame.KEYDOWN:
                 
                 self.highlight_sound.play()
                 if event.key == pygame.K_LEFT:
                     self.highlight_sound.play()
-                    self.passto_selected_index = (self.passto_selected_index - 1) % len(
+                    self.passto_selected_index = (self.passto_selected_index - inc) % len(
                         self.team_bots
                     )
+                    inc = -1
 
                 elif event.key == pygame.K_RIGHT:
                     self.highlight_sound.play()
-                    self.passto_selected_index = (self.passto_selected_index + 1) % len(
+                    self.passto_selected_index = (self.passto_selected_index + inc) % len(
                         self.team_bots 
                     )
                 elif event.key == pygame.K_RETURN or event.key == pygame.K_SPACE: 
                     bot = self.team_bots[self.passto_selected_index]
                     self.player.bot = bot
-                    print(bot.position.x)
-                    print(bot.position.y)
                     bot.ball = True
                     self.player.ball = False
                     self.player.passselecting = False
 
         bot = self.team_bots[self.passto_selected_index]
+        if bot == self.player:
+            self.passto_selected_index += inc
+            bot = self.team_bots[self.passto_selected_index]
         pos_x = bot.position[0] - self.all_sprites_group.offset.x
         pos_y = bot.position[1] - 120
         pygame.draw.circle(self.screen, "Green", (pos_x, pos_y), 15)
@@ -548,6 +570,7 @@ class Game:
         continue_menu(self)
 
     def run(self):
+        self.player.give_ball()
         self.game_loop()
         self.start_menu()
 
