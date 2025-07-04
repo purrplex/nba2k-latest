@@ -91,6 +91,7 @@ class Game:
         ]
 
         self.team_bots_pos = []
+        self.opp_bots_pos = []
 
         self.four_one = [
             (1500, 550),
@@ -156,6 +157,7 @@ class Game:
         )
 
         self.team_bots = []
+        self.opp_bots = []
 
         self.basketball = None
         self.testball = TestBall(
@@ -251,10 +253,10 @@ class Game:
     def basketball_done(self, pos, scored):
         self.basketball = None
         
-        #random.choice(self.team_bots).give_ball()
+        random.choice(self.team_bots + self.opp_bots).give_ball()
         
     def create_basketball(self, data):
-        self.score[1] += 1
+        # self.score[1] += 1
         data['score'] = self.basketball_scored
         data['remove'] = self.basketball_done
         self.basketball = Basketball(data)
@@ -372,14 +374,16 @@ class Game:
             random.shuffle(bots)
 
             for i in range(5):
-                OppBots(
+                
+                self.opp_bots.append(OppBots(
                     (self.team_bots_pos[i][0] + 120, self.team_bots_pos[i][1]),
                     (self.all_sprites_group, self.bots_group),
                     self.team_bots[i],
                     team,
                     bots[i],
                     self.outOfBounds,
-                )
+                ))
+
             self.opp_bots_created = True
 
     def show_qtr(self, qtr, screen):
