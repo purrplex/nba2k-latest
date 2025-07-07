@@ -36,7 +36,6 @@ class Player(pygame.sprite.Sprite):
         self.max_speed = 500
         self.min_speed = 200
         self.speed_decay = 100
-
         
         self.shooting = False
         self.shoottimer = False
@@ -481,8 +480,12 @@ class Player(pygame.sprite.Sprite):
         if action == "pass":
             if target:
                 ball_data['direction'] = (self.bot.position - self.position).normalize()
-            
-        
+
+        if abs(self.hoop_xy.x - self.position.x) > 400:
+            ball_data['point_value'] = 3
+        else:
+            ball_data['point value'] = 2    
+
         self.create_basketball(ball_data)
         self.basketball_created = True
         #self.ball = False
