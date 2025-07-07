@@ -489,6 +489,7 @@ class Player(pygame.sprite.Sprite):
             if target:
                 ball_data['direction'] = (self.bot.position - self.position).normalize()   
 
+
         self.create_basketball(ball_data)
         self.basketball_created = True
         #self.ball = False
