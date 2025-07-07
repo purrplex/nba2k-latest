@@ -479,12 +479,7 @@ class Player(pygame.sprite.Sprite):
             
         if action == "pass":
             if target:
-                ball_data['direction'] = (self.bot.position - self.position).normalize()
-
-        if abs(self.hoop_xy.x - self.position.x) > 400:
-            ball_data['point_value'] = 3
-        else:
-            ball_data['point_value'] = 2    
+                ball_data['direction'] = (self.bot.position - self.position).normalize()   
 
         self.create_basketball(ball_data)
         self.basketball_created = True

@@ -246,21 +246,53 @@ class Game:
 
     # Functions
     
-    def basketball_scored(self, ball_data):
-        self.score[0] += ball_data.get('point_value', 1)
+    def basketball_scored(self, ball_info):
+        three_pointer = abs(ball_info.get('distance').x) > 400
+        point_value = 2
+        if three_pointer:
+            point_value = 3
+            
+        if ball_info.get('side') == "left":
+            self.score[1] += point_value
+        else:
+            self.score[0] += point_value
         self.niceshot_timer = self.niceshot_timer_dur
         
-    def basketball_done(self, pos, scored):
+        ball_pos = self.basketball.pos.copy()
         self.basketball = None
+        bots = [bot for bot in self.team_bots + self.opp_bots if bot is not self.player]
         
-        random.choice(self.team_bots + self.opp_bots).give_ball()
+        closest = None
+        closest_dist = float('inf')
+        for bot in bots:
+            dist = (ball_pos - bot.position).magnitude()
+            if dist < closest_dist:
+                closest_dist = dist
+                closest = bot
+                
+        closest.give_ball()
+        #random.choice(bots).give_ball()
+        #self.player.give_ball()
+        
+    def basketball_rebound(self, pos):
+        self.basketball = None
+        bots = [bot for bot in self.team_bots + self.opp_bots if bot is not self.player]
+        #random.choice(bots).give_ball()
+        self.player.give_ball()
+        
+    def basketball_catch(self, pos, player):
+        self.basketball = None
+        player.give_ball()
         
     def create_basketball(self, data):
-        # self.score[1] += 1
+        if self.basketball:
+            self.basketball.remove()
+            self.basketball = None
         data['score'] = self.basketball_scored
-        data['remove'] = self.basketball_done
+        data['rebound'] = self.basketball_rebound
+        data['catch'] = self.basketball_catch
+        data['group'] = self.all_sprites_group
         self.basketball = Basketball(data)
-        #data['player'].ball = False
 
     def show_niceshot(self, dt):
         if self.niceshot_timer <= 0:
