@@ -39,8 +39,7 @@ def game_loop(self):
 
             self.inbounder.snap_throw_instructions(self.screen)
 
-            self.ball = self.testball.update(self.ball)
-            self.ball = self.testball2.update(self.ball)
+            colliding_sprites = self.testball.update() + self.testball2.update()
 
         else:
 
@@ -72,8 +71,10 @@ def game_loop(self):
 
             else:
                 self.bots_group.update(dt, self.screen, time, self.winner)
-                self.ball = self.testball.update(self.ball)
-                self.ball = self.testball2.update(self.ball)
+                colliding_sprites = self.testball.update() + self.testball2.update()
+                for sprite in colliding_sprites:
+                    if sprite == self.player:
+                        self.player.give_ball()
 
                 self.outOfBounds = self.player.update(
                     dt,
