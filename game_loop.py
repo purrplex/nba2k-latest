@@ -64,7 +64,7 @@ def game_loop(self):
                 self.background,
                 self.qtr,
                 self.show_qtr,
-                self.show_score,            
+                self.show_score,      
 
             )
             if self.player.passselecting == True:
