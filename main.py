@@ -246,8 +246,19 @@ class Game:
 
     # Functions
     
+    def get_closest_bot(self, pos):
+        bots = [bot for bot in self.team_bots + self.opp_bots if bot is not self.player]
+        closest = None
+        closest_dist = float('inf')
+        for bot in bots:
+            dist = (pos - bot.position).magnitude()
+            if dist < closest_dist:
+                closest_dist = dist
+                closest = bot
+        return closest or self.player
+    
     def basketball_scored(self, ball_info):
-        three_pointer = abs(ball_info.get('distance').x) > 400
+        three_pointer = abs(ball_info.get('distance').x) > 450
         point_value = 2
         if three_pointer:
             point_value = 3
@@ -260,24 +271,17 @@ class Game:
         
         ball_pos = self.basketball.pos.copy()
         self.basketball = None
-        bots = [bot for bot in self.team_bots + self.opp_bots if bot is not self.player]
         
-        closest = None
-        closest_dist = float('inf')
-        for bot in bots:
-            dist = (ball_pos - bot.position).magnitude()
-            if dist < closest_dist:
-                closest_dist = dist
-                closest = bot
-                
-        closest.give_ball()
-        #random.choice(bots).give_ball()
-        #self.player.give_ball()
+        closest = self.get_closest_bot(ball_pos)
+        #closest.give_ball()
+        self.player.give_ball()
         
     def basketball_rebound(self, pos):
+        ball_pos = self.basketball.pos.copy()
         self.basketball = None
-        bots = [bot for bot in self.team_bots + self.opp_bots if bot is not self.player]
-        #random.choice(bots).give_ball()
+        
+        closest = self.get_closest_bot(ball_pos)
+        #closest.give_ball()
         self.player.give_ball()
         
     def basketball_catch(self, pos, player):

@@ -1,6 +1,7 @@
 import pygame
 import random
 from pygame.math import Vector2 as vector
+from stats import PLAYER_STATS
 
 
 class OppBots(pygame.sprite.Sprite):
@@ -24,6 +25,13 @@ class OppBots(pygame.sprite.Sprite):
         self.animation = self.animations["idle"]
         self.image = self.animation[self.frame_index]
         self.rect = self.image.get_rect(center=pos)
+        
+        if selected_player in PLAYER_STATS:
+            self.stats = PLAYER_STATS[selected_player]
+        else:
+            self.stats = {
+                'shoot_chance':50,
+            }
 
         self.height = 0
         self.velocity = 0

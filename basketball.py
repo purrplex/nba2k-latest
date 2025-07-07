@@ -120,19 +120,17 @@ class Basketball(pygame.sprite.Sprite):
             self.scored_side = "right"
             
         if self.rect.colliderect(self.backboard[self.scored_side]):
-            print(self.bounces)
             self.direction.x *= -0.67
             self.direction.y *= 0.5
             self.pos = self.last_pos.copy()
             #self.pos.x += self.direction.x
             self.bounces += 1
             self.hoop_bounces += 1
-            return
         
         ball_pos = pygame.math.Vector2(self.rect.centerx, self.rect.centery)
         
         hoop_distance = (self.hoop_coords[self.scored_side] - ball_pos).magnitude()
-        if hoop_distance > 40:
+        if hoop_distance > 45:
             return
         
         self.scored()
@@ -147,10 +145,7 @@ class Basketball(pygame.sprite.Sprite):
                 self.height = -250 * self.scale_factor
                 self.velocity *= -.67
                 self.bounces += 1
-                if self.hoop_bounces > 1:
-                    print(self.hoop_bounces)
-                    self.handle_catch()
-                if self.bounces >= 2:
+                if self.bounces >= 1:
                     self.rebound()
             
         self.hoop_detection(dt, left_side=True)

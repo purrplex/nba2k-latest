@@ -54,8 +54,11 @@ class Player(pygame.sprite.Sprite):
         self.team_bots = None
         self.bot = None
         self.basketball_created = False
+        self.player_moves_with_ball = True
         self.scale_factor = 1.0
-        self.hoop_xy = pygame.math.Vector2(1850,562)
+        self.hoop = {}
+        self.hoop['knicks'] = pygame.math.Vector2(1850,562)
+        self.hoop['lakers'] = pygame.math.Vector2(310,562)
 
         self.jump_sound = pygame.mixer.Sound("images/sounds/jump.wav")
         self.jump_sound.set_volume(0.05)
@@ -245,6 +248,11 @@ class Player(pygame.sprite.Sprite):
         if self.shoottimer == True:
             self.dttimer += dt    
 
+        if not self.player_moves_with_ball:
+            self.is_idle = True
+            self.direction.x = 0
+            self.direction.y = 0
+        
         if not self.ball:
             # Reset direction
             self.is_idle = True
@@ -471,10 +479,10 @@ class Player(pygame.sprite.Sprite):
         
         if self.status == "right":
             ball_data['pos'] = (self.rect.topright[0] - 50, self.rect.topright[1] + 10)
-            ball_data['direction'] = (self.hoop_xy - self.position).normalize()
+            ball_data['direction'] = (self.hoop['knicks'] - self.position).normalize()
         elif self.status == "left":
             ball_data['pos'] = (self.rect.topleft[0] + 50, self.rect.topleft[1] + 10)
-            ball_data['direction'] = (self.hoop_xy - self.position).normalize()
+            ball_data['direction'] = (self.hoop['lakers'] - self.position).normalize()
             
             
         if action == "pass":
