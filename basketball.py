@@ -1,5 +1,6 @@
 import pygame
-
+from team_bots import TeamBots
+from opp_bots import OppBots
 
 # Their curls cascade, a silken sight,
 # Like sunlit waves, both dark and bright.
@@ -160,7 +161,7 @@ class Basketball(pygame.sprite.Sprite):
             sprite
             for sprite in colliding_sprites
             if sprite != self and sprite != self.player
-            and (isinstance(sprite, BasePlayer))
+            and (isinstance(sprite, (OppBots, TeamBots)))
         ]
         
         if colliding_sprites:
