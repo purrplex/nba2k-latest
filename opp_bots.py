@@ -261,10 +261,12 @@ class OppBots(pygame.sprite.Sprite):
         st_elapsed = pygame.time.get_ticks() - self.steal_timer
         if st_elapsed == 0:
             self.steal = False
-        if  st_elapsed >= 500:
-            self.steal = True
+        if  st_elapsed >= 5000:
+            if random.random() < 0.1:
+                self.steal = True
+            else:
+                self.steal = False
             self.steal_timer = pygame.time.get_ticks()
-            print(self.steal_timer)
 
     def animation_done(self):
         if self.steal:
