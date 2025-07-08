@@ -43,6 +43,7 @@ class OppBots(pygame.sprite.Sprite):
         self.max_speed = 500
         self.min_speed = 200
         self.speed_decay = 100
+        self.steal_timer = pygame.time.get_ticks()
 
         self.stop = 0
         self.ball = None
@@ -249,12 +250,22 @@ class OppBots(pygame.sprite.Sprite):
             self.outofbounds(screen, time)
             self.reset_position()
             self.direction.y = 0
-
+ pygame.time.get_ticks()¶
         if (self.position.y < 350 or self.position.y > 775) and not self.height != 0:
             self.outofbounds(screen, time)
             self.reset_position()
             self.direction.y = 0"""
         
+    def opp_steal(self):
+
+        st_elapsed = pygame.time.get_ticks() - self.steal_timer
+        if st_elapsed == 0:
+            self.steal = False
+        if  st_elapsed >= 500:
+            self.steal = True
+            self.steal_timer = pygame.time.get_ticks()
+            print(self.steal_timer)
+
     def animation_done(self):
         if self.steal:
             self.steal = False
@@ -401,5 +412,6 @@ class OppBots(pygame.sprite.Sprite):
         self.outOfBounds = True
         self.move(dt, screen, time)
         self.animate(dt)
+        self.opp_steal()
 
         return self.outOfBounds
