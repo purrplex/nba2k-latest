@@ -1,6 +1,7 @@
 import pygame
 import random
 from pygame.math import Vector2 as vector
+from stats import PLAYER_STATS
 
 
 class TeamBots(pygame.sprite.Sprite):
@@ -42,6 +43,13 @@ class TeamBots(pygame.sprite.Sprite):
         self.position = vector(self.rect.center)
         self.target_pos = target_pos
         self.target_position = vector(self.target_pos[0])
+        
+        if selected_player in PLAYER_STATS:
+            self.stats = PLAYER_STATS[selected_player]
+        else:
+            self.stats = {
+                "shoot_chance":50,
+            }
 
         self.height = 0
         self.velocity = 0
@@ -67,7 +75,9 @@ class TeamBots(pygame.sprite.Sprite):
         self.basketball = None
         self.basketball_created = False
         self.scale_factor = 1.0
-        self.hoop_xy = pygame.math.Vector2(1850,562)
+        self.hoop = {}
+        self.hoop['knicks'] = pygame.math.Vector2(1850,562)
+        self.hoop['lakers'] = pygame.math.Vector2(310,562)
 
         self.notice_radius = 1000
         self.move_radius = 850
@@ -421,10 +431,10 @@ class TeamBots(pygame.sprite.Sprite):
         
         if self.status == "right":
             ball_data['pos'] = (self.rect.topright[0] - 50, self.rect.topright[1] + 10)
-            ball_data['direction'] = (self.hoop_xy - self.position).normalize()
+            ball_data['direction'] = (self.hoop['knicks'] - self.position).normalize()
         elif self.status == "left":
             ball_data['pos'] = (self.rect.topleft[0] + 50, self.rect.topleft[1] + 10)
-            ball_data['direction'] = (self.hoop_xy - self.position).normalize()
+            ball_data['direction'] = (self.hoop['lakers'] - self.position).normalize()
             
             
         if action == "pass":

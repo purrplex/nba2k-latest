@@ -19,8 +19,7 @@ class TestBall(pygame.sprite.Sprite):
 
         self.ball = False
 
-    def update(self, ball):
-        self.ball = ball
+    def update(self):
 
         colliding_sprites = pygame.sprite.spritecollide(
             self, self.group[2], False, pygame.sprite.collide_mask
@@ -33,6 +32,6 @@ class TestBall(pygame.sprite.Sprite):
         ]
 
         if colliding_sprites:
-            self.ball = True
+            return colliding_sprites
 
-        return self.ball
+        return []
