@@ -292,7 +292,7 @@ class Game:
                 self.deffensiveplay = False
                 self.offensiveplay = True
         else:
-            if type(closest) == OppBots:
+            if type(closest) == TeamBots:
                 self.deffensiveplay = False
                 self.offensiveplay = True
             else:
