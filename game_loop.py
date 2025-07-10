@@ -96,5 +96,14 @@ def game_loop(self):
             self.snap = False
             self.qtr += 1
 
+        if self.offensiveplay:
+            self.player.offensiveplay_screen(self.screen, time)
+            self.offensiveplay = False
+        
+        if self.deffensiveplay:
+            self.player.deffensiveplay_screen(self.screen, time)
+            self.deffensiveplay = False
+
+
         pygame.display.update()
 

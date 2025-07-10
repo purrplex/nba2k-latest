@@ -356,6 +356,10 @@ def render_continue_menu(self):
         elif self.team == "LAKERS":
             menu_text = "LAKERS BALL"
             menu_color = "yellow"
+
+        self.offensiveplay = True
+        self.deffensiveplay = False
+
     elif not self.winner:
         if self.team == "lakers":
             menu_text = "LAKERS BALL"
@@ -363,6 +367,9 @@ def render_continue_menu(self):
         elif self.team == "knicks":
             menu_text = "KNICKS BALL"
             menu_color = "orange"
+
+        self.offensiveplay = False
+        self.deffensiveplay = True
     else:
         menu_text = "DRAW"
         menu_color = "red"

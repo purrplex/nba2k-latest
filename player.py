@@ -22,7 +22,6 @@ class Player(pygame.sprite.Sprite):
         self.animation = self.animations["idle"]
         self.image = self.animation[self.frame_index]
         self.rect = self.image.get_rect(center=pos)
-        
         self.create_basketball = create_basketball
         
 
@@ -148,6 +147,40 @@ class Player(pygame.sprite.Sprite):
 
         self.speed = 0
         self.outOfBounds = True
+        self.direction = pygame.math.Vector2(1, 0)
+
+    def offensiveplay_screen(self, screen, time):
+        screen.fill((0, 0, 0))
+        my_font = pygame.font.Font("images/font.ttf", 100)
+
+        message = "OFFENSIVE PLAY"
+        color = "yellow"
+
+        downs_surface = my_font.render(message, True, color)
+        downs_rect = downs_surface.get_rect(
+            center=(self.WINDOW_WIDTH // 2, self.WINDOW_HEIGHT // 2)
+        )
+        screen.blit(downs_surface, downs_rect)
+        pygame.display.flip()
+        time.sleep(1)
+
+        self.direction = pygame.math.Vector2(1, 0)
+
+    def deffensiveplay_screen(self, screen, time):
+        screen.fill((0, 0, 0))
+        my_font = pygame.font.Font("images/font.ttf", 100)
+
+        message = "DEFFENSIVE PLAY"
+        color = "yellow"
+
+        downs_surface = my_font.render(message, True, color)
+        downs_rect = downs_surface.get_rect(
+            center=(self.WINDOW_WIDTH // 2, self.WINDOW_HEIGHT // 2)
+        )
+        screen.blit(downs_surface, downs_rect)
+        pygame.display.flip()
+        time.sleep(1)
+
         self.direction = pygame.math.Vector2(1, 0)
 
     def reset_position(self):
@@ -523,6 +556,8 @@ class Player(pygame.sprite.Sprite):
 
         if self.shoottimer == True:
             self.draw_shoot_meter(screen)
+
+
 
         self.winner = winner
         self.input(events, dt)

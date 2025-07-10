@@ -52,6 +52,8 @@ class Game:
         self.upthescore = True
         self.outOfBounds = False
         self.outOfBounds2 = False
+        self.offensiveplay = None
+        self.deffensiveplay = None
         self.inbounder_is_active = True
         self.snap = False
         self.menu = False
@@ -281,8 +283,24 @@ class Game:
         self.basketball = None
         
         closest = self.get_closest_bot(ball_pos)
-        #closest.give_ball()
-        self.player.give_ball()
+        closest.give_ball()
+        if self.offensiveplay == True:
+            if type(closest) == OppBots:
+                self.deffensiveplay = True
+                self.offensiveplay = False
+            else:
+                self.deffensiveplay = False
+                self.offensiveplay = True
+        else:
+            if type(closest) == OppBots:
+                self.deffensiveplay = False
+                self.offensiveplay = True
+            else:
+                self.deffensiveplay = True
+                self.offensiveplay = False
+
+        # self.player.give_ball()
+
         
     def basketball_catch(self, pos, player):
         self.basketball = None
@@ -391,7 +409,7 @@ class Game:
                             play_name,
                             self.outOfBounds,
                             target_pos,
-                            self.create_basketball
+                            self.create_basketball,
                         )
                     )
             self.team_bots_created = True
