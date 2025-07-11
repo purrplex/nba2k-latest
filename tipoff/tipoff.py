@@ -141,11 +141,11 @@ class TipOff:
 
             self.draw()
 
-            if self.score[0] == 5 or self.score[1] == 5:
-                if self.score[0] == 5:
+            if self.score[0] == 1 or self.score[1] == 1:
+                if self.score[0] == 1:
                     self.winner = True
                     self.tipoff_win_sound.play()
-                elif self.score[1] == 5:
+                elif self.score[1] == 1:
                     self.winner = False
                     self.tipoff_lose_sound.play()
                 else:
