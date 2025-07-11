@@ -1,5 +1,6 @@
 import pygame
 import time
+import random
 from basketball import Basketball
 
 
@@ -166,6 +167,44 @@ class Player(pygame.sprite.Sprite):
 
         self.direction = pygame.math.Vector2(1, 0)
 
+
+    def foul_screen(self, screen, time):
+        screen.fill((0, 0, 0))
+        my_font = pygame.font.Font("images/font.ttf", 100)
+
+        message = "FOUL"
+        color = "yellow"
+
+        downs_surface = my_font.render(message, True, color)
+        downs_rect = downs_surface.get_rect(
+            center=(self.WINDOW_WIDTH // 2, self.WINDOW_HEIGHT // 2)
+        )
+        screen.blit(downs_surface, downs_rect)
+        pygame.display.flip()
+        time.sleep(1)
+
+        self.direction = pygame.math.Vector2(1, 0)
+        time.sleep(1)
+
+        self.freethrow()
+
+    def flop_screen(self, screen, time):
+        screen.fill((0, 0, 0))
+        my_font = pygame.font.Font("images/font.ttf", 100)
+
+        message = "FLOP"
+        color = "yellow"
+
+        downs_surface = my_font.render(message, True, color)
+        downs_rect = downs_surface.get_rect(
+            center=(self.WINDOW_WIDTH // 2, self.WINDOW_HEIGHT // 2)
+        )
+        screen.blit(downs_surface, downs_rect)
+        pygame.display.flip()
+        time.sleep(1)
+
+        self.direction = pygame.math.Vector2(1, 0)
+
     def deffensiveplay_screen(self, screen, time):
         screen.fill((0, 0, 0))
         my_font = pygame.font.Font("images/font.ttf", 100)
@@ -272,10 +311,20 @@ class Player(pygame.sprite.Sprite):
                 if event.key == pygame.K_a and not self.flopping and not self.ball:
                     self.flopping = True
                     self.frame_index = 0
+                    
+                    if random.randint(0,4):
+                        self.foul_screen
+                    else:
+                        self.flop_screen
 
                 if event.key == pygame.K_s and not self.falling and not self.ball:
                     self.falling = True
                     self.frame_index = 0
+
+                    if random.randint(0,4):
+                        self.foul_screen
+                    else:
+                        self.flop_screen
 
         keys = pygame.key.get_pressed()
         if self.shoottimer == True:

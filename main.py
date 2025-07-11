@@ -191,9 +191,6 @@ class Game:
         if not hasattr(self, "game_channel"):
             self.game_channel = pygame.mixer.Channel(2)
 
-        if not hasattr(self, "ft_channel"):
-            self.game_channel = pygame.mixer.Channel(3)
-
         # Instructions
         self.instructions = [
             "HOW TO PLAY:",

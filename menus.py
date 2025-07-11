@@ -145,6 +145,41 @@ def playerselect_menu(self):
         self.render_playerselect_menu()
         pygame.display.flip()
 
+def free_throw(self):
+    running = True
+
+    # Disable spacebar for a few seconds when the menu is rendered
+    self.spacebar_enabled = False
+    pygame.time.set_timer(pygame.USEREVENT, 100)
+
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.USEREVENT:
+                self.spacebar_enabled = True
+                pygame.time.set_timer(pygame.USEREVENT, 0)  # Stop the timer
+
+            if event.type == pygame.KEYDOWN:
+                if not self.spacebar_enabled and event.key == pygame.K_SPACE:
+                    continue  # Ignore spacebar presses if disabled
+                    
+    
+        self.render_free_throw()
+        pygame.display.flip()
+
+
+
+def render_free_throw(self):
+    self.screen.blit(self.background, (-900,0))
+    pygame.display.flip()
+    
+
+
+
+
 
 def render_teamselect_menu(self):
     self.screen.fill(self.BLACK)
