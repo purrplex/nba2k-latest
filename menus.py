@@ -177,10 +177,6 @@ def render_free_throw(self):
     pygame.display.flip()
     
 
-
-
-
-
 def render_teamselect_menu(self):
     self.screen.fill(self.BLACK)
     teamselect_font = pygame.font.Font("images/font.ttf", 150)

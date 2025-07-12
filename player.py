@@ -5,7 +5,7 @@ from basketball import Basketball
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, groups, create_basketball):
+    def __init__(self, pos, groups, create_basketball, screen):
         super().__init__(groups)
         self.group = groups
         self.WINDOW_WIDTH, self.WINDOW_HEIGHT = 1215, 812
@@ -24,7 +24,7 @@ class Player(pygame.sprite.Sprite):
         self.image = self.animation[self.frame_index]
         self.rect = self.image.get_rect(center=pos)
         self.create_basketball = create_basketball
-        
+        self.screen = screen
 
         self.height = 0
         self.velocity = 0
@@ -312,19 +312,11 @@ class Player(pygame.sprite.Sprite):
                     self.flopping = True
                     self.frame_index = 0
                     
-                    if random.randint(0,4):
-                        self.foul_screen
-                    else:
-                        self.flop_screen
 
                 if event.key == pygame.K_s and not self.falling and not self.ball:
                     self.falling = True
                     self.frame_index = 0
 
-                    if random.randint(0,4):
-                        self.foul_screen
-                    else:
-                        self.flop_screen
 
         keys = pygame.key.get_pressed()
         if self.shoottimer == True:
@@ -386,6 +378,12 @@ class Player(pygame.sprite.Sprite):
             self.ball = False
         elif self.steal:
             print('steal done')
+        
+        if self.flopping or self.falling:
+            if random.randint(0,4):
+                self.foul_screen(self.screen, time)
+            else:
+                self.flop_screen(self.screen, time)
 
         self.steal = False
         self.landing = False

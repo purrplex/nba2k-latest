@@ -150,7 +150,7 @@ class Game:
         # Classes
         self.tipoff = TipOff()
 
-        self.player = Player((1100, 500), (self.all_sprites_group, self.player_group), self.create_basketball)
+        self.player = Player((1100, 500), (self.all_sprites_group, self.player_group), self.create_basketball, self.screen)
         self.inbounder = Inbounder(
             (250, 350),
             self.inbounder_group,
