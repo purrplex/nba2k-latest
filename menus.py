@@ -103,7 +103,7 @@ def playerselect_menu(self):
                     )
                 elif event.key == pygame.K_RIGHT:
                     self.highlight_sound.play()
-                    self.player_selected_index = (self.player_selected_index + 1) % len(
+                    self.player_start_menuselected_index = (self.player_selected_index + 1) % len(
                         self.player_menu_items
                     )
                 elif event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
