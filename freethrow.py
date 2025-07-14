@@ -6,10 +6,11 @@ class FreeThrow:
 
 	def __init__(self, game):
 		self.game = game
-		
+
 		self.shooter = None
 
 		self.players_set = False
+
 
 	def draw(self, screen):
 		# screen.blit(self.game.background, (-900,0))
@@ -58,17 +59,19 @@ class FreeThrow:
 
 
 	def setup(self):
-		for i, bot in enumerate(self.game.team_bots):
-			bot.free_throw_init((i*100)+1100, 400, self.shooter)
+		for i, bot in enumerate(self.game.team_bots[:2]):
+			bot.free_throw_init((i*100)+1700, 400, self.shooter)
 
-		for i, bot in enumerate(self.game.opp_bots):
-			bot.free_throw_init((i*100)+1100, 600, self.shooter)
+		for i, bot in enumerate(self.game.opp_bots[:3]):
+			bot.free_throw_init((i*100)+1700, 600, self.shooter)
 
 		self.game.player.free_throw_init(1500, 500, self.shooter)
 
 		if self.shooter:
 			self.shooter.free_throw_init(1500, 500, self.shooter)
 
+		self.shooter.ball = False
+	
 	def start(self, screen, shooter=None):
 		self.shooter = shooter
 		self.setup()
