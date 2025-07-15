@@ -306,6 +306,19 @@ class Player(pygame.sprite.Sprite):
 			self.is_idle = True
 			self.direction.x = 0
 			self.direction.y = 0
+			if keys[pygame.K_w]:
+				self.ball = True
+				self.shooting = True
+				self.jump_sound.play()
+				self.velocity = self.jump_speed
+				self.height = self.jump_start
+				self.animation = self.animation
+				self.basketball_created = False
+				self.frame_index = 0
+				self.direction = pygame.math.Vector2(0, 0)
+				power = min(self.dttimer, 2.5) / 2.5
+				self.shootpower = 1
+				self.dttimer = 0
 		
 		if not self.ball:
 			# Reset direction
