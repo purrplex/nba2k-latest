@@ -306,23 +306,46 @@ class Player(pygame.sprite.Sprite):
 			self.is_idle = True
 			self.direction.x = 0
 			self.direction.y = 0
-			if keys[pygame.K_w]:
-				self.ball = True
-				self.shooting = True
-				self.jump_sound.play()
-				self.velocity = self.jump_speed
-				self.height = self.jump_start
-				self.animation = self.animation
-				self.basketball_created = False
-				self.frame_index = 0
-				self.direction = pygame.math.Vector2(0, 0)
-				power = min(self.dttimer, 2.5) / 2.5
-				ft_success = True
-				if ft_success:
+				
+			if keys[pygame.K_s]:
+				print("start")
+				ft_meter = 50
+				print("ft meter: " + str(ft_meter))
+				decrease = random.randint(20, 30)
+				print("decrese: " + str(decrease))
+				ft_meter = ft_meter - decrease
+				print("ft_meter: " + str(ft_meter))
+				if keys[pygame.K_SPACE]:
+					increase = random.randint(5, 20)
+					print("increase: " +str(increase))
+					ft_meter = ft_meter + increase
+					print("ft meter: " + str(ft_meter))
+				if ft_meter >= 100:
+					self.ball = True
+					self.shooting = True
+					self.jump_sound.play()
+					self.velocity = self.jump_speed
+					self.height = self.jump_start
+					self.animation = self.animation
+					self.basketball_created = False
+					self.frame_index = 0
+					self.direction = pygame.math.Vector2(0, 0)
+					power = min(self.dttimer, 2.5) / 2.5
 					self.shootpower = 1
-				else:
+				elif ft_meter <= 0:
+					self.ball = True
+					self.shooting = True
+					self.jump_sound.play()
+					self.velocity = self.jump_speed
+					self.height = self.jump_start
+					self.animation = self.animation
+					self.basketball_created = False
+					self.frame_index = 0
+					self.direction = pygame.math.Vector2(0, 0)
+					power = min(self.dttimer, 2.5) / 2.5
 					self.shootpower = 4
-				self.dttimer = 0
+
+			self.dttimer = 0
 		
 		if not self.ball:
 			# Reset direction
