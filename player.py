@@ -317,7 +317,11 @@ class Player(pygame.sprite.Sprite):
 				self.frame_index = 0
 				self.direction = pygame.math.Vector2(0, 0)
 				power = min(self.dttimer, 2.5) / 2.5
-				self.shootpower = 1
+				ft_success = True
+				if ft_success:
+					self.shootpower = 1
+				else:
+					self.shootpower = 4
 				self.dttimer = 0
 		
 		if not self.ball:
