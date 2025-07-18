@@ -16,7 +16,13 @@ def game_loop(self):
 		dt = self.clock.tick(60) / 1000
 
 		if self.team == "knicks" or self.team == None:
-			self.screen.blit(self.knicksbackground, (-492, 0))
+			if self.offensiveplay:
+				self.screen.blit(self.knicksbackground, (-492, 0))
+			elif self.deffensiveplay: 
+				self.screen.blit(self.knicksbackground, (0,0))
+			else:
+				self.screen.blit(self.knicksbackground, (-492, 0))
+
 			self.background = self.knicksbackground
 		elif self.team == "lakers":
 			self.screen.blit(self.lakersbackground, (-492, 0))
