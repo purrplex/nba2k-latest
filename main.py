@@ -287,22 +287,30 @@ class Game:
 		
 		closest = self.get_closest_bot(ball_pos)
 		self.give_ball(closest)
+		self.update_play()
+
+	def update_play(self, player):	
 		if self.offensiveplay == True:
-			if type(closest) == OppBots:
-				self.player.position = pygame.math.Vector2(500,500)
-				self.deffensiveplay = True
-				self.offensiveplay = False
+			if type(player) == OppBots:
+				if player != self.player:
+					self.player.position = pygame.math.Vector2(400,500)
+					self.deffensiveplay = True
+					self.offensiveplay = False
+					player.position = pygame.math.Vector2(500,500)
+					for bot in self.team_bots: 
+						for pos in bot.target_pos:
+							pos = (bot.target_pos[0]-1200, bot.target_pos[1])
 			else:
 				self.deffensiveplay = False
 				self.offensiveplay = True
 		else:
-			if type(closest) == TeamBots:
+			if type(player) == TeamBots:
 				self.deffensiveplay = False
 				self.offensiveplay = True
 			else:
 				self.deffensiveplay = True
 				self.offensiveplay = False
-		
+
 	def basketball_rebound(self, pos):
 		ball_pos = self.basketball.pos.copy()
 		self.basketball = None
