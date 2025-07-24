@@ -297,6 +297,7 @@ class Game:
 		
 		if self.offensiveplay == True:
 			if type(closest) == OppBots:
+				self.player.position = pygame.math.Vector2(500,500)
 				self.deffensiveplay = True
 				self.offensiveplay = False
 			else:
@@ -307,6 +308,7 @@ class Game:
 				self.deffensiveplay = False
 				self.offensiveplay = True
 			else:
+				self.player.position = pygame.math.Vector2
 				self.deffensiveplay = True
 				self.offensiveplay = False
 		
