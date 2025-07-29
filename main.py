@@ -334,6 +334,13 @@ class Game:
 		data['group'] = self.all_sprites_group
 		self.basketball = Basketball(data)
 
+	def show_free_throw_instructons(self):
+		my_font = pygame.font.Font("images/font.ttf", 100)
+		speed_surface = my_font.render("PRESS S TO START", True, "yellow")
+		speed_rect = speed_surface.get_rect()
+		speed_rect.midtop = (750, 100)
+		self.screen.blit(speed_surface, speed_rect)
+
 	def show_niceshot(self, dt):
 		if self.niceshot_timer <= 0:
 			return
@@ -644,12 +651,6 @@ class Game:
 
 	def continue_menu(self):
 		continue_menu(self)
-
-	def free_throw(self):
-		free_throw(self)
-
-	def render_free_throw(self):
-		render_free_throw(self)
 
 	def run(self):
 		self.player.give_ball()

@@ -128,13 +128,18 @@ class FreeThrow:
 					pygame.quit()
 					sys.exit()
 
-				if event.type == pygame.KEYUP:
-					pass
+			while True:
+				self.game.show_free_throw_instructons()
+				if pygame.K_s:
+					break
 
-				if event.type == pygame.KEYDOWN:
-					if event.key == pygame.K_ESCAPE:
-						self.end()
-						return
+				# if event.type == pygame.KEYUP:
+				# 	pass
+
+				# if event.type == pygame.KEYDOWN:
+				# 	if event.key == pygame.K_ESCAPE:
+				# 		self.end()
+				# 		return
 
 			dt = self.game.clock.tick(60) / 1000
 
