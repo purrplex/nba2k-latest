@@ -287,7 +287,7 @@ class Game:
 		
 		closest = self.get_closest_bot(ball_pos)
 		self.give_ball(closest)
-		self.update_play()
+		self.update_play(closest)
 
 	def update_play(self, player):	
 		if self.offensiveplay == True:
@@ -317,6 +317,8 @@ class Game:
 		
 		closest = self.get_closest_bot(ball_pos)
 		self.give_ball(closest)
+		self.update_play(closest)
+
 		
 		
 	def basketball_catch(self, pos, player):
