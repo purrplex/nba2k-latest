@@ -184,6 +184,12 @@ class TeamBots(pygame.sprite.Sprite):
 		self.position = vector(x, y)
 		self.rect.center = round(self.position.x), round(self.position.y)
 
+	def deffensive_position(self):
+		self.status = "left"
+		self.speed = 0
+		self.position.x -= 850
+		self.rect.center = round(self.position.x), round(self.position.y)
+
 	def free_throw_init(self, x, y, shooter):
 		self.reset_position(x, y)
 		self.is_idle = True

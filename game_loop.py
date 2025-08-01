@@ -114,6 +114,9 @@ def game_loop(self):
 			self.player.deffensiveplay_screen(self.screen)
 			self.deffensiveplay = False
 			self.player.reset_position()
+			for bot in self.team_bots:
+				if bot != self.player:
+					bot.deffensive_position()
 			 
 
 		pygame.display.update()
