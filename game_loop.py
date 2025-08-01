@@ -113,6 +113,8 @@ def game_loop(self):
 		if self.deffensiveplay:
 			self.player.deffensiveplay_screen(self.screen)
 			self.deffensiveplay = False
+			self.player.reset_position()
+			 
 
 		pygame.display.update()
 
