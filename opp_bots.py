@@ -429,6 +429,12 @@ class OppBots(pygame.sprite.Sprite):
 		)
 		self.rect = self.image.get_rect(center=self.rect.center)
 		
+	def deffensive_position(self):
+		self.status = "left"
+		self.speed = 0
+		self.position.x -= 850
+		self.rect.center = round(self.position.x), round(self.position.y)	
+
 	def give_ball(self):
 		self.ball = True
 		self.basketball_created = False

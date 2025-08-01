@@ -117,6 +117,8 @@ def game_loop(self):
 			for bot in self.team_bots:
 				if bot != self.player:
 					bot.deffensive_position()
+			for bot in self.opp_bots:
+					bot.deffensive_position()
 			 
 
 		pygame.display.update()
