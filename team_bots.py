@@ -62,6 +62,8 @@ class TeamBots(pygame.sprite.Sprite):
 		self.min_speed = 200
 		self.speed_decay = 100
 
+		self.love = True
+		self.deffensive = None
 		self.stop = 0
 		self.ball = None
 		self.pass_steal = False
@@ -189,6 +191,14 @@ class TeamBots(pygame.sprite.Sprite):
 		self.speed = 0
 		self.position.x -= 850
 		self.rect.center = round(self.position.x), round(self.position.y)
+		self.deffensive = True
+
+	def offensive_position(self):
+		self.status = "right"
+		self.speed = 0
+		self.position.x += 850
+		self.rect.center = round(self.position.x), round(self.position.y)
+
 
 	def free_throw_init(self, x, y, shooter):
 		self.reset_position(x, y)
@@ -210,6 +220,8 @@ class TeamBots(pygame.sprite.Sprite):
 		current_time = pygame.time.get_ticks()
 		if current_time - self.last_move_time > 2000:
 			self.target_position = random.choice(self.target_pos)
+			if self.deffensive:
+				self.target_position = (self.target_position[0]-850, self.target_position[1])
 			self.last_move_time = current_time
 
 		distance = (self.target_position - self.position).magnitude()

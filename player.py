@@ -36,6 +36,7 @@ class Player(pygame.sprite.Sprite):
 		self.min_speed = 200
 		self.speed_decay = 100
 		
+		self.love = True
 		self.shooting = False
 		self.shoottimer = False
 		self.ball = None
@@ -287,18 +288,17 @@ class Player(pygame.sprite.Sprite):
 					self.passselecting = True
 					
 				elif event.key == pygame.K_d and not self.steal and not self.ball:
-					self.steal = True
-					self.frame_index = 0
-					self.ball = True
-					self.offensiveplay_screen(screen)
-					self.reset_position()
-					for bot in self.opp_bots:
-						bot.ball = False
-					for bot in self.team_bots:
-						if bot != self:
-							bot.reset_position()
-					for bot in self.opp_bots:
-							bot.reset_position()
+						self.frame_index = 0
+						self.ball = True
+						self.offensiveplay_screen(screen)
+						self.reset_position()
+						for bot in self.opp_bots:
+							bot.ball = False
+						for bot in self.team_bots:
+							if bot != self:
+								bot.offensive_position()
+						for bot in self.opp_bots:
+								bot.offensive_position()
 
 				if event.key == pygame.K_a and not self.flopping and not self.ball:
 					self.flopping = True
