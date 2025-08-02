@@ -5,7 +5,7 @@ from basketball import Basketball
 
 
 class Player(pygame.sprite.Sprite):
-	def __init__(self, pos, groups, create_basketball):
+	def __init__(self, pos, groups, create_basketball, ):
 		super().__init__(groups)
 		self.group = groups
 		self.WINDOW_WIDTH, self.WINDOW_HEIGHT = 1215, 812
@@ -24,7 +24,6 @@ class Player(pygame.sprite.Sprite):
 		self.image = self.animation[self.frame_index]
 		self.rect = self.image.get_rect(center=pos)
 		self.create_basketball = create_basketball
-		
 
 		self.height = 0
 		self.velocity = 0
@@ -55,6 +54,7 @@ class Player(pygame.sprite.Sprite):
 		self.free_throw = False
 		self.basketball = None
 		self.team_bots = None
+		self.opp_bots = None
 		self.bot = None
 		self.basketball_created = False
 		self.player_moves_with_ball = True
@@ -256,7 +256,7 @@ class Player(pygame.sprite.Sprite):
 	def draw(self, screen):
 		screen.blit(self.image, self.rect)
 
-	def input(self, events, dt):
+	def input(self, events, dt, screen):
 		for event in events:
 			if event.type == pygame.KEYUP:
 				if event.key == pygame.K_w and self.height == 0:    
@@ -288,8 +288,17 @@ class Player(pygame.sprite.Sprite):
 					
 				elif event.key == pygame.K_d and not self.steal and not self.ball:
 					self.steal = True
-					self.ball = True
 					self.frame_index = 0
+					self.ball = True
+					self.offensiveplay_screen(screen)
+					self.reset_position()
+					for bot in self.opp_bots:
+						bot.ball = False
+					for bot in self.team_bots:
+						if bot != self:
+							bot.reset_position()
+					for bot in self.opp_bots:
+							bot.reset_position()
 
 				if event.key == pygame.K_a and not self.flopping and not self.ball:
 					self.flopping = True
@@ -615,7 +624,7 @@ class Player(pygame.sprite.Sprite):
 				
 
 
-	def update(self, dt, events, screen, team, winner, selected_player):
+	def update(self, dt, events, screen, team, winner, selected_player, ):
 		if (self.team, self.selected_player) != (team, selected_player):
 			self.team = team
 			self.selected_player = selected_player
@@ -627,7 +636,7 @@ class Player(pygame.sprite.Sprite):
 
 	
 		self.winner = winner
-		self.input(events, dt)
+		self.input(events, dt, screen)
 		self.outOfBounds = False
 		self.move(dt, screen)
 		#self.update_basketball()

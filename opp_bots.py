@@ -311,6 +311,7 @@ class OppBots(pygame.sprite.Sprite):
 		self.flopping = False
 		self.falling = False
 
+
 	def animate(self, dt):
 		if self.height != 0:
 			if self.ball:

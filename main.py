@@ -466,6 +466,7 @@ class Game:
 				))
 
 			self.opp_bots_created = True
+			self.player.opp_bots = self.opp_bots
 
 	def show_qtr(self, qtr, screen):
 		self.qtr = qtr % 4
