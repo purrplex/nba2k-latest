@@ -288,6 +288,7 @@ class Player(pygame.sprite.Sprite):
 					
 				elif event.key == pygame.K_d and not self.steal and not self.ball:
 					self.steal = True
+					self.ball = True
 					self.frame_index = 0
 
 				if event.key == pygame.K_a and not self.flopping and not self.ball:
