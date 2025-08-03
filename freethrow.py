@@ -11,6 +11,8 @@ class FreeThrow:
 
 		self.players_set = False
 
+		self.ft_bar = 0
+
 
 	def draw(self, screen):
 		# screen.blit(self.game.background, (-900,0))
@@ -88,6 +90,27 @@ class FreeThrow:
 			self.flop_screen(screen)
 			self.free_throw_loop(screen)
 
+	def draw_ft_meter(self, screen):
+		bar_width = 800
+		bar_height = 100
+		bar_x = self.game.WINDOW_WIDTH/2
+		bar_y = self.game.WINDOW_HEIGHT/2
+		pygame.draw.rect(screen, (255, 255, 255), (bar_x, bar_y, bar_width, bar_height))
+
+		# Calculate the width of the green bar based on the player's shot 
+		green_bar_width = min(self.ft_bar, 100) / 100 * bar_width
+		
+
+		pygame.draw.rect(
+			screen, (0, 255, 0), (bar_x, bar_y, green_bar_width, bar_height)
+		)
+		my_font = pygame.font.Font("images/font.ttf", 100)
+		speed_surface = my_font.render("FREE THROW POWER:", True, pygame.Color(255, 255, 255))
+		speed_rect = speed_surface.get_rect()
+		speed_rect.midtop = (bar_x - 100, bar_y)
+		screen.blit(speed_surface, speed_rect)		
+
+
 	def end(self):
 		for bot in self.game.bots_group:
 			bot.free_throw_exit()
@@ -127,6 +150,14 @@ class FreeThrow:
 				if event.type == pygame.QUIT:
 					pygame.quit()
 					sys.exit()
+				if event.type == pygame.KEYDOWN:
+					if event.key == pygame.K_SPACE:
+						chance = random.randint(10,20)
+						self.ft_bar = chance
+
+			decrease_chance = random.randint(15,30)
+			if self.ft_bar > 0:
+				self.ft_bar -= decrease_chance
 
 			while True:
 				self.game.show_free_throw_instructons()
@@ -141,11 +172,15 @@ class FreeThrow:
 				# 		self.end()
 				# 		return
 
+			self.draw_ft_meter()
+			
 			dt = self.game.clock.tick(60) / 1000
 
 			self.update_players(dt, events, screen)
 
 			if self.game.basketball:
 				self.game.basketball.update(dt)
+
+			
 
 			self.draw(screen)
