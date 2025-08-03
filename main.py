@@ -50,10 +50,11 @@ class Game:
 		self.player_select_group = pygame.sprite.Group()
 
 		# variables
+		self.love = True
 		self.upthescore = True
 		self.outOfBounds = False
 		self.outOfBounds2 = False
-		self.offensiveplay = None
+		self.offensiveplay = True
 		self.deffensiveplay = None
 		self.inbounder_is_active = True
 		self.snap = False
