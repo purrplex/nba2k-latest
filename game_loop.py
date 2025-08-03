@@ -74,12 +74,8 @@ def game_loop(self):
 				for bot in self.bots_group:
 					__, flop = bot.update(dt, self.screen, time, self.winner)
 					if flop:
-						if self.deffensiveplay != True:
-							free_throw = True
-						elif self.deffensiveplay:
-							self.deffensiveplay = False
-							self.offensiveplay = True
-					
+						free_throw = True
+
 				colliding_sprites = self.testball.update() + self.testball2.update()
 				for sprite in colliding_sprites:
 					if sprite == self.player:
@@ -95,11 +91,15 @@ def game_loop(self):
 				)
 
 				if flop or fall or free_throw:
-					self.free_throw = True
-					self.free_throw_shooter = self.player
-					self.FreeThrow.start(self.screen, self.player)
-					self.free_throw = False
-				
+					if self.offensiveplay == True:
+						self.free_throw = True
+						self.free_throw_shooter = self.player
+						self.FreeThrow.start(self.screen, self.player)
+						self.free_throw = False
+					else: 
+						self.offensiveplay = True
+						self.deffensiveplay = False
+
 		if self.basketball:
 			self.basketball.update(dt)
 			
