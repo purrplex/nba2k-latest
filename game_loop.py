@@ -1,6 +1,6 @@
 import pygame, sys
 import time
-
+import random
 
 def game_loop(self):
 	self.tipoff_music.stop()
@@ -97,8 +97,11 @@ def game_loop(self):
 						self.FreeThrow.start(self.screen, self.player)
 						self.free_throw = False
 					else: 
-						self.offensiveplay = True
-						self.deffensiveplay = False
+						chance = random.randint(0,20)
+						print(chance)
+						if chance == 19:
+							self.offensiveplay = True
+							self.deffensiveplay = False
 
 		if self.basketball:
 			self.basketball.update(dt)
