@@ -91,17 +91,22 @@ def game_loop(self):
 				)
 
 				if flop or fall or free_throw:
-					if self.offensiveplay == True:
-						self.free_throw = True
-						self.free_throw_shooter = self.player
-						self.FreeThrow.start(self.screen, self.player)
-						self.free_throw = False
-					else: 
-						chance = random.randint(0,20)
-						print(chance)
-						if chance == 19:
-							self.offensiveplay = True
-							self.deffensiveplay = False
+					self.free_throw = True
+					self.free_throw_shooter = self.player
+					self.FreeThrow.start(self.screen, self.player)
+					self.free_throw = False
+
+					# if self.offensiveplay == True:
+					# 	self.free_throw = True
+					# 	self.free_throw_shooter = self.player
+					# 	self.FreeThrow.start(self.screen, self.player)
+					# 	self.free_throw = False
+					# else: 
+					# 	chance = random.randint(0,20)
+					# 	print(chance)
+					# 	if chance == 19:
+					# 		self.offensiveplay = True
+					# 		self.deffensiveplay = False
 
 		if self.basketball:
 			self.basketball.update(dt)

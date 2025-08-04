@@ -14,6 +14,7 @@ class FreeThrow:
 		self.ft_bar = 0
 
 
+
 	def draw(self, screen):
 		# screen.blit(self.game.background, (-900,0))
 
@@ -52,6 +53,7 @@ class FreeThrow:
 		screen.blit(downs_surface, downs_rect)
 		pygame.display.flip()
 		time.sleep(1)
+		self.draw_ft_meter(screen)
 
 	def foul_screen(self, screen):
 		self.draw_screen(screen, 'FOUL')
@@ -62,21 +64,43 @@ class FreeThrow:
 
 	def setup(self):
 		for i, bot in enumerate(self.game.team_bots):
-			if i < 2:
-				bot.free_throw_init((i*120)+1650,(400), self.shooter)
-			else:
-				bot.free_throw_init(0, 0, self.shooter)
+
+			if self.game.offensiveplay:
+				if i < 2:
+					bot.free_throw_init((i*120)+1650,(400), self.shooter)
+				else:
+					bot.free_throw_init(0, 0, self.shooter)
+
+			if self.game.deffensiveplay:
+				if i < 2:
+					bot.free_throw_init((i*120)+650,(400), self.shooter)
+				else:
+					bot.free_throw_init(0, 0, self.shooter)
 
 		for i, bot in enumerate(self.game.opp_bots):
-			if i < 1:
-				bot.free_throw_init((i*120)+1750, (600), self.shooter)
-			else:
-				bot.free_throw_init(0, 0, self.shooter)
 
-		self.game.player.free_throw_init(1500, 500, self.shooter)
+			if self.game.offensiveplay:
+				if i < 1:
+					bot.free_throw_init((i*120)+1750, (600), self.shooter)
+				else:
+					bot.free_throw_init(0, 0, self.shooter)
+
+			if self.game.deffensiveplay:
+				if i < 1:
+					bot.free_throw_init((i*120)+750, (600), self.shooter)
+				else:
+					bot.free_throw_init(0, 0, self.shooter)
+		
+		if self.game.offensiveplay:
+			self.game.player.free_throw_init(1500, 500, self.shooter)
+		elif self.game.deffensiveplay:
+			self.game.player.free_throw_init(500, 500, self.shooter)
 
 		if self.shooter:
-			self.shooter.free_throw_init(1500, 500, self.shooter)
+			if self.game.offensiveplay:
+				self.shooter.free_throw_init(1500, 500, self.shooter)
+			if self.game.deffensiveplay:
+				self.shooter.free_throw_init(800, 500, self.shooter)
 
 		self.shooter.ball = False
 	
@@ -91,10 +115,10 @@ class FreeThrow:
 			self.free_throw_loop(screen)
 
 	def draw_ft_meter(self, screen):
-		bar_width = 800
+		bar_width = 100
 		bar_height = 100
-		bar_x = self.game.WINDOW_WIDTH/2
-		bar_y = self.game.WINDOW_HEIGHT/2
+		bar_x = 500
+		bar_y = 500
 		pygame.draw.rect(screen, (255, 255, 255), (bar_x, bar_y, bar_width, bar_height))
 
 		# Calculate the width of the green bar based on the player's shot 
@@ -172,7 +196,6 @@ class FreeThrow:
 				# 		self.end()
 				# 		return
 
-			self.draw_ft_meter()
 			
 			dt = self.game.clock.tick(60) / 1000
 
