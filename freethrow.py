@@ -63,29 +63,38 @@ class FreeThrow:
 
 
 	def setup(self):
-		for i, bot in enumerate(self.game.team_bots):
 
-			if self.game.offensiveplay:
+		if self.game.offensiveplay:
+
+			for i, bot in enumerate(self.game.team_bots):
+
 				if i < 2:
 					bot.free_throw_init((i*120)+1650,(400), self.shooter)
 				else:
 					bot.free_throw_init(0, 0, self.shooter)
 
-			if self.game.deffensiveplay:
+		if self.game.deffensiveplay:
+
+			for i, bot in enumerate(self.game.team_bots):
+
 				if i < 2:
 					bot.free_throw_init((i*120)+650,(400), self.shooter)
 				else:
 					bot.free_throw_init(0, 0, self.shooter)
 
-		for i, bot in enumerate(self.game.opp_bots):
+		if self.game.offensiveplay:
 
-			if self.game.offensiveplay:
+			for i, bot in enumerate(self.game.opp_bots):
+					
 				if i < 1:
 					bot.free_throw_init((i*120)+1750, (600), self.shooter)
 				else:
 					bot.free_throw_init(0, 0, self.shooter)
 
-			if self.game.deffensiveplay:
+		if self.game.deffensiveplay:
+
+			for i, bot in enumerate(self.game.opp_bots):
+					
 				if i < 1:
 					bot.free_throw_init((i*120)+750, (600), self.shooter)
 				else:

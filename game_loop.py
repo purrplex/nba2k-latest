@@ -92,7 +92,10 @@ def game_loop(self):
 
 				if flop or fall or free_throw:
 					self.free_throw = True
-					self.free_throw_shooter = self.player
+					if self.offensiveplay:
+						self.free_throw_shooter = self.player
+					else:
+						self.free_throw_shooter = "kobe"
 					self.FreeThrow.start(self.screen, self.player)
 					self.free_throw = False
 
