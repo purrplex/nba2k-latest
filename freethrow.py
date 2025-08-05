@@ -11,7 +11,7 @@ class FreeThrow:
 
 		self.players_set = False
 
-		self.ft_bar = 0
+		self.ft_bar = 100
 
 
 
@@ -38,6 +38,7 @@ class FreeThrow:
 
 			)
 			
+		self.draw_ft_meter(screen)
 		pygame.display.flip()
 
 	def draw_screen(self, screen, message):
@@ -53,7 +54,6 @@ class FreeThrow:
 		screen.blit(downs_surface, downs_rect)
 		pygame.display.flip()
 		time.sleep(1)
-		self.draw_ft_meter(screen)
 
 	def foul_screen(self, screen):
 		self.draw_screen(screen, 'FOUL')
@@ -124,23 +124,23 @@ class FreeThrow:
 			self.free_throw_loop(screen)
 
 	def draw_ft_meter(self, screen):
-		bar_width = 100
-		bar_height = 100
-		bar_x = 500
-		bar_y = 500
+		bar_width = 400
+		bar_height = 50
+		bar_x = 700
+		bar_y = 100
 		pygame.draw.rect(screen, (255, 255, 255), (bar_x, bar_y, bar_width, bar_height))
 
 		# Calculate the width of the green bar based on the player's shot 
-		green_bar_width = min(self.ft_bar, 100) / 100 * bar_width
+		green_bar_width = self.ft_bar
 		
 
 		pygame.draw.rect(
 			screen, (0, 255, 0), (bar_x, bar_y, green_bar_width, bar_height)
 		)
-		my_font = pygame.font.Font("images/font.ttf", 100)
+		my_font = pygame.font.Font("images/font.ttf", 70)
 		speed_surface = my_font.render("FREE THROW POWER:", True, pygame.Color(255, 255, 255))
 		speed_rect = speed_surface.get_rect()
-		speed_rect.midtop = (bar_x - 100, bar_y)
+		speed_rect.midtop = (bar_x - 300, bar_y)
 		screen.blit(speed_surface, speed_rect)		
 
 
@@ -185,10 +185,10 @@ class FreeThrow:
 					sys.exit()
 				if event.type == pygame.KEYDOWN:
 					if event.key == pygame.K_SPACE:
-						chance = random.randint(10,20)
+						chance = random.randint(100,400)
 						self.ft_bar = chance
 
-			decrease_chance = random.randint(15,30)
+			decrease_chance = random.randint(0,2)
 			if self.ft_bar > 0:
 				self.ft_bar -= decrease_chance
 
