@@ -121,19 +121,6 @@ def game_loop(self):
 			self.snap = False
 			self.qtr += 1
 
-		if self.offensiveplay:
-			self.player.offensiveplay_screen(self.screen)
-			self.offensiveplay = False
-		
-		if self.deffensiveplay:
-			self.player.deffensiveplay_screen(self.screen)
-			self.deffensiveplay = False
-			self.player.reset_position()
-			for bot in self.team_bots:
-				if bot != self.player:
-					bot.deffensive_position()
-			for bot in self.opp_bots:
-					bot.deffensive_position()
 			 
 
 		pygame.display.update()
