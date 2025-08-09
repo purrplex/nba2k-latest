@@ -11,7 +11,7 @@ class FreeThrow:
 
 		self.players_set = False
 
-		self.ft_bar = 100
+		self.ft_bar = 50
 
 
 
@@ -37,8 +37,10 @@ class FreeThrow:
 				self.game.show_score,      
 
 			)
-			
-		self.draw_ft_meter(screen)
+		if self.ft_bar > 0 and self.ft_bar < 100:
+			self.draw_ft_meter(screen)
+		elif self.ft_bar <= 0 or self.ft_bar >= 100:
+			self.draw_ft_result(screen)
 		pygame.display.flip()
 
 	def draw_screen(self, screen, message):
@@ -143,6 +145,15 @@ class FreeThrow:
 		speed_rect.midtop = (bar_x - 300, bar_y)
 		screen.blit(speed_surface, speed_rect)		
 
+	def draw_ft_result(self, screen):
+		my_font = pygame.font.Font("images/font.ttf", 70)
+		if self.ft_bar <= 0:
+			speed_surface = my_font.render("MISS", True, pygame.Color(255, 255, 255))
+		if self.ft_bar >= 100:
+			speed_surface = my_font.render("NICE SHOT", True, pygame.Color(255, 255, 255))
+		speed_rect = speed_surface.get_rect()
+		speed_rect.midtop = (400, 100)
+		screen.blit(speed_surface, speed_rect)		
 
 	def end(self):
 		for bot in self.game.bots_group:
@@ -185,12 +196,12 @@ class FreeThrow:
 					sys.exit()
 				if event.type == pygame.KEYDOWN:
 					if event.key == pygame.K_SPACE:
-						chance = random.randint(100,400)
-						self.ft_bar = chance
-
-			decrease_chance = random.randint(0,2)
-			if self.ft_bar > 0:
-				self.ft_bar -= decrease_chance
+						chance = random.randint(10,20)
+						self.ft_bar += chance
+			if self.ft_bar > 0 and self.ft_bar < 100:
+				decrease_chance = random.randint(0,0)
+				if self.ft_bar > 0 and self.ft_bar < 100:
+					self.ft_bar -= decrease_chance
 
 			while True:
 				self.game.show_free_throw_instructons()
