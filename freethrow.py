@@ -133,7 +133,7 @@ class FreeThrow:
 		pygame.draw.rect(screen, (255, 255, 255), (bar_x, bar_y, bar_width, bar_height))
 
 		# Calculate the width of the green bar based on the player's shot 
-		green_bar_width = self.ft_bar
+		green_bar_width = min(self.ft_bar, 100)/100 * bar_width
 		
 
 		pygame.draw.rect(
