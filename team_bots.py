@@ -214,6 +214,8 @@ class TeamBots(pygame.sprite.Sprite):
 
 	def free_throw_exit(self):
 		self.free_throw = False
+		position = random.choice(self.target_pos)
+		self.position = vector(position[0], position[1])
 
 	def get_position_distance_direction(self):
 		# Change target every 2 seconds

@@ -179,6 +179,8 @@ class OppBots(pygame.sprite.Sprite):
 
 	def free_throw_exit(self):
 		self.free_throw = False
+		self.position = self.player.position.copy()
+		self.position.x += 120
 
 	def get_player_distance_direction(self):
 		enemy_pos = vector(self.rect.center)
