@@ -299,8 +299,9 @@ class Game:
 					self.offensiveplay = False
 					player.position = pygame.math.Vector2(500,500)
 					for bot in self.team_bots: 
-						for pos in bot.target_pos:
-							pos = (bot.target_pos[0]-1200, bot.target_pos[1])
+						if bot != self.player:
+							for pos in bot.target_pos:
+								pos = (bot.target_pos[0][0]-1200, bot.target_pos[0][1])
 			else:
 				self.deffensiveplay = False
 				self.offensiveplay = True
@@ -322,7 +323,7 @@ class Game:
 			# self.deffensiveplay = False
 			self.player.reset_position()
 			for bot in self.team_bots:
-				if bot != self.player:
+				if bot != self.player: 
 					bot.deffensive_position()
 			for bot in self.opp_bots:
 					bot.deffensive_position()

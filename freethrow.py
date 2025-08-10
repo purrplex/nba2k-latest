@@ -41,6 +41,11 @@ class FreeThrow:
 			self.draw_ft_meter(screen)
 		elif self.ft_bar <= 0 or self.ft_bar >= 100:
 			self.draw_ft_result(screen)
+			if self.ft_bar >= 100:
+				self.game.player.height = 1
+				self.game.player.basketball_created = True
+
+				self.game.player.animation = self.game.player.animations["shoot"]
 		pygame.display.flip()
 
 	def draw_screen(self, screen, message):
