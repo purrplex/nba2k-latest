@@ -6,46 +6,48 @@ class FreeThrow:
 
 	def __init__(self, game):
 		self.game = game
-
 		self.shooter = None
-
 		self.players_set = False
+		self.shooter_shot = False
+		self.show_instructions = False
+		self.running = True
 
 		self.ft_bar = 50
 
+	def draw_instructons_screen(self, screen):
+		my_font = pygame.font.Font("images/font.ttf", 100)
+		speed_surface = my_font.render("PRESS S TO START", True, "yellow")
+		speed_rect = speed_surface.get_rect()
+		speed_rect.midtop = (750, 100)
+		screen.blit(speed_surface, speed_rect)
 
+	def draw_ft_bar(self, screen):
+		if self.ft_bar > 0 and self.ft_bar < 100:
+			self.draw_ft_meter(screen)
+		elif self.ft_bar <= 0 or self.ft_bar >= 100:
+			self.draw_ft_result(screen)
+			if self.ft_bar >= 100:
+				self.shooter.shoot()
+				self.shooter_shot = True
 
 	def draw(self, screen):
-		# screen.blit(self.game.background, (-900,0))
-
-		# self.game.player.draw(screen)
-		
-		# for bot in self.game.team_bots:
-			# bot.draw(screen)
-		# for bot in self.game.opp_bots:
-			# bot.draw(screen)
-
-		# if self.game.basketball:
-			# self.game.basketball.draw(screen)
-
 		self.game.all_sprites_group.customize_draw(
 				self.game.player,
 				screen,
 				self.game.background,
 				self.game.qtr,
 				self.game.show_qtr,
-				self.game.show_score,      
+				self.game.show_score,
 
 			)
-		if self.ft_bar > 0 and self.ft_bar < 100:
-			self.draw_ft_meter(screen)
-		elif self.ft_bar <= 0 or self.ft_bar >= 100:
-			self.draw_ft_result(screen)
-			if self.ft_bar >= 100:
-				self.game.player.height = 1
-				self.game.player.basketball_created = True
 
-				self.game.player.animation = self.game.player.animations["shoot"]
+		if not self.shooter_shot:
+			self.draw_ft_bar(screen)
+
+		if self.show_instructions:
+			screen.fill((0,0,0))
+			self.draw_instructons_screen(screen)
+			
 		pygame.display.flip()
 
 	def draw_screen(self, screen, message):
@@ -68,6 +70,8 @@ class FreeThrow:
 	def flop_screen(self, screen):
 		self.draw_screen(screen, 'FLOP')
 
+	def basketball_event(self, event_type):
+		self.running = False
 
 	def setup(self):
 
@@ -121,6 +125,12 @@ class FreeThrow:
 		self.shooter.ball = False
 	
 	def start(self, screen, shooter=None):
+		self.players_set = False
+		self.shooter_shot = False
+		self.show_instructions = False
+		self.running = True
+		self.ft_bar = 50
+		
 		self.shooter = shooter
 		self.setup()
 		if random.randint(0,4):
@@ -161,10 +171,12 @@ class FreeThrow:
 		screen.blit(speed_surface, speed_rect)		
 
 	def end(self):
-		for bot in self.game.bots_group:
+		for bot in self.game.team_bots:
 			bot.free_throw_exit()
 
-		self.game.player.free_throw_exit()
+		for bot in self.game.opp_bots:
+			bot.free_throw_exit()
+
 		
 	def update_players(self, dt, events, screen):
 		for bot in self.game.bots_group:
@@ -180,8 +192,6 @@ class FreeThrow:
 		)
 		
 	def free_throw_loop(self, screen):
-		running = True
-
 		# Disable spacebar for a few seconds when the menu is rendered
 		self.spacebar_enabled = False
 		pygame.time.set_timer(pygame.USEREVENT, 100)
@@ -192,7 +202,7 @@ class FreeThrow:
 			elif self.game.team == "lakers":
 				self.game.background = self.game.lakersbackground
 
-		while running:
+		while self.running:
 			screen.fill((0,0,0))
 			events = pygame.event.get()
 			for event in events:
@@ -203,32 +213,19 @@ class FreeThrow:
 					if event.key == pygame.K_SPACE:
 						chance = random.randint(10,20)
 						self.ft_bar += chance
+					if event.key == pygame.K_s:
+						self.show_instructions = False
 			if self.ft_bar > 0 and self.ft_bar < 100:
 				decrease_chance = random.randint(0,0)
 				if self.ft_bar > 0 and self.ft_bar < 100:
 					self.ft_bar -= decrease_chance
 
-			while True:
-				self.game.show_free_throw_instructons()
-				if pygame.K_s:
-					break
-
-				# if event.type == pygame.KEYUP:
-				# 	pass
-
-				# if event.type == pygame.KEYDOWN:
-				# 	if event.key == pygame.K_ESCAPE:
-				# 		self.end()
-				# 		return
-
-			
 			dt = self.game.clock.tick(60) / 1000
 
 			self.update_players(dt, events, screen)
 
 			if self.game.basketball:
 				self.game.basketball.update(dt)
-
-			
+	
 
 			self.draw(screen)

@@ -208,6 +208,7 @@ class Player(pygame.sprite.Sprite):
 
 	def free_throw_exit(self):
 		self.free_throw = False
+		self.position = pygame.math.Vector2(1100, 500)
 
 	def move(self, dt, screen):
 		if self.direction.magnitude() != 0:
@@ -257,22 +258,29 @@ class Player(pygame.sprite.Sprite):
 	def draw(self, screen):
 		screen.blit(self.image, self.rect)
 
+	def shoot(self):
+		if self.free_throw:
+			self.ball = True
+			self.shooting = True
+			self.shootpower = random.random() * 0.2 + 0.8
+		else:
+			power = min(self.dttimer, 2.5) / 2.5
+			self.dttimer = 0
+			self.shoottimer = False
+			self.shootpower = power * 5
+			
+		self.jump_sound.play()
+		self.velocity = self.jump_speed
+		self.height = self.jump_start
+		self.basketball_created = False
+		self.frame_index = 0
+		self.direction = pygame.math.Vector2(0, 0)
+
 	def input(self, events, dt, screen):
 		for event in events:
 			if event.type == pygame.KEYUP:
 				if event.key == pygame.K_w and self.height == 0:    
-					self.jump_sound.play()
-					self.velocity = self.jump_speed
-					self.height = self.jump_start
-					self.animation = self.animation
-					self.basketball_created = False
-					self.frame_index = 0
-					self.direction = pygame.math.Vector2(0, 0)
-					power = min(self.dttimer, 2.5) / 2.5
-					self.shootpower = power * 5
-					self.dttimer = 0
-					self.shoottimer = False
-					# self.shooting = False
+					self.shoot()
 					
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_SPACE:
@@ -420,7 +428,58 @@ class Player(pygame.sprite.Sprite):
 		self.flopping = False
 		self.falling = False
 
+	def apply_scale(self):
+		# Applys the scale factor to the image
+		width, height = self.image.get_size()
+		new_width = int(width * self.scale_factor)
+		new_height = int(height * self.scale_factor)
+		self.image = pygame.transform.scale(
+			self.animation[int(self.frame_index)], (new_width, new_height)
+		)
+		self.rect = self.image.get_rect(center=self.rect.center)
+
+	def update_frame(self, dt):
+		if self.landing:
+			self.frame_index += 15 * dt
+		else:
+			self.frame_index += 10 * dt
+
+		if self.animation in [
+			self.animations["jump"],
+			self.animations["jump_left"],
+			self.animations["shoot"],
+			self.animations["shoot_left"],
+			self.animations["pass"],
+			self.animations["pass_left"],
+			self.animations["land_right"],
+			self.animations["land_left"],
+			self.animations["steal"],
+			self.animations["steal_left"],
+			self.animations["flop"],
+			self.animations["flop_left"],
+			self.animations["fall"],
+			self.animations["fall_left"],
+		]:
+
+			if self.frame_index > len(self.animation) - 2:
+				self.animation_done()
+			else:
+				if self.ball or self.landing or self.passing or self.steal:
+					self.speed = 0
+				else:
+					self.speed = self.speed
+
+		if self.frame_index >= len(self.animation):
+			self.frame_index = 0
+		self.image = self.animation[int(self.frame_index)]
+
 	def animate(self, dt):
+		# if self.free_throw:
+			# #self.free_throw_animate(dt)
+			# self.update_frame(dt)
+			# self.apply_scale()
+			# return
+			
 		if self.height != 0:
 			if self.ball or self.basketball_created:
 				if self.status == "right":
@@ -493,48 +552,9 @@ class Player(pygame.sprite.Sprite):
 					if self.falling:
 						self.animation = self.animations["fall_left"]
 
-		if self.landing:
-			self.frame_index += 15 * dt
-		else:
-			self.frame_index += 10 * dt
+		self.update_frame(dt)
+		self.apply_scale()
 
-		if self.animation in [
-			self.animations["jump"],
-			self.animations["jump_left"],
-			self.animations["shoot"],
-			self.animations["shoot_left"],
-			self.animations["pass"],
-			self.animations["pass_left"],
-			self.animations["land_right"],
-			self.animations["land_left"],
-			self.animations["steal"],
-			self.animations["steal_left"],
-			self.animations["flop"],
-			self.animations["flop_left"],
-			self.animations["fall"],
-			self.animations["fall_left"],
-		]:
-
-			if self.frame_index > len(self.animation) - 2:
-				self.animation_done()
-			else:
-				if self.ball or self.landing or self.passing or self.steal:
-					self.speed = 0
-				else:
-					self.speed = self.speed
-
-		if self.frame_index >= len(self.animation):
-			self.frame_index = 0
-		self.image = self.animation[int(self.frame_index)]
-
-		# Applys the scale factor to the image
-		width, height = self.image.get_size()
-		new_width = int(width * self.scale_factor)
-		new_height = int(height * self.scale_factor)
-		self.image = pygame.transform.scale(
-			self.animation[int(self.frame_index)], (new_width, new_height)
-		)
-		self.rect = self.image.get_rect(center=self.rect.center)
 
 	def draw_speed_meter(self, screen):
 		bar_width = 200

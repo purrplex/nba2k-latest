@@ -272,6 +272,7 @@ class Game:
 		player.give_ball()
 	
 	def basketball_scored(self, ball_info):
+		self.FreeThrow.basketball_event('score')
 		three_pointer = abs(ball_info.get('distance').x) > 450
 		point_value = 2
 		if three_pointer:
@@ -290,37 +291,21 @@ class Game:
 		self.give_ball(closest)
 		self.update_play(closest)
 
-	def update_play(self, player):	
-		if self.offensiveplay == True:
-			if type(player) == OppBots:
-				if player != self.player:
-					self.player.position = pygame.math.Vector2(400,500)
-					self.deffensiveplay = True
-					self.offensiveplay = False
-					player.position = pygame.math.Vector2(500,500)
-					for bot in self.team_bots: 
-						if bot != self.player:
-							for pos in bot.target_pos:
-								pos = (bot.target_pos[0][0]-1200, bot.target_pos[0][1])
-			else:
-				self.deffensiveplay = False
-				self.offensiveplay = True
-		else:
-			if type(player) == TeamBots:
-				self.deffensiveplay = False
-				self.offensiveplay = True
-			else:
-				self.deffensiveplay = True
-				self.offensiveplay = False
-
+	def update_play(self, player):
+		offense = isinstance(player, (TeamBots, Player))
+		self.offensiveplay = offense
+		self.deffensiveplay = not offense
 
 		if self.offensiveplay:
 			self.player.offensiveplay_screen(self.screen)
-			# self.offensiveplay = False
+			for bot in self.team_bots: 
+				if bot != self.player:
+					for pos in bot.target_pos:
+						pos = (bot.target_pos[0][0]-1200, bot.target_pos[0][1])
+			player.position = pygame.math.Vector2(500,500)
 		
 		if self.deffensiveplay:
 			self.player.deffensiveplay_screen(self.screen)
-			# self.deffensiveplay = False
 			self.player.reset_position()
 			for bot in self.team_bots:
 				if bot != self.player: 
@@ -329,6 +314,7 @@ class Game:
 					bot.deffensive_position()
 
 	def basketball_rebound(self, pos):
+		self.FreeThrow.basketball_event('rebound')
 		ball_pos = self.basketball.pos.copy()
 		self.basketball = None
 		
@@ -352,13 +338,6 @@ class Game:
 		data['catch'] = self.basketball_catch
 		data['group'] = self.all_sprites_group
 		self.basketball = Basketball(data)
-
-	def show_free_throw_instructons(self):
-		my_font = pygame.font.Font("images/font.ttf", 100)
-		speed_surface = my_font.render("PRESS S TO START", True, "yellow")
-		speed_rect = speed_surface.get_rect()
-		speed_rect.midtop = (750, 100)
-		self.screen.blit(speed_surface, speed_rect)
 
 	def show_niceshot(self, dt):
 		if self.niceshot_timer <= 0:
