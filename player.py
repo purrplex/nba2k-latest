@@ -276,6 +276,24 @@ class Player(pygame.sprite.Sprite):
 		self.frame_index = 0
 		self.direction = pygame.math.Vector2(0, 0)
 
+	def shoot_miss(self):
+		if self.free_throw:
+			self.ball = True
+			self.shooting = True
+			self.shootpower = random.random() * 0.5 + 0.9
+		else:
+			power = min(self.dttimer, 2.5) / 2.5
+			self.dttimer = 0
+			self.shoottimer = False
+			self.shootpower = power * 6
+			
+		self.jump_sound.play()
+		self.velocity = self.jump_speed
+		self.height = self.jump_start
+		self.basketball_created = False
+		self.frame_index = 0
+		self.direction = pygame.math.Vector2(0, 0)
+
 	def input(self, events, dt, screen):
 		for event in events:
 			if event.type == pygame.KEYUP:
