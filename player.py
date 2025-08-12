@@ -315,16 +315,18 @@ class Player(pygame.sprite.Sprite):
 					
 				elif event.key == pygame.K_d and not self.steal and not self.ball:
 						self.frame_index = 0
-						self.ball = True
-						self.offensiveplay_screen(screen)
-						self.reset_position()
-						for bot in self.opp_bots:
-							bot.ball = False
-						for bot in self.team_bots:
-							if bot != self:
-								bot.offensive_position()
-						for bot in self.opp_bots:
-								bot.offensive_position()
+						if bot.ball: 
+							dist = (bot.position - self.position).magnitude()
+							if dist < 5:
+								self.ball = True
+								self.offensiveplay_screen(screen)
+								self.reset_position()
+								bot.ball = False
+								for bot in self.team_bots:
+									if bot != self:
+										bot.offensive_position()
+								for bot in self.opp_bots:
+										bot.offensive_position()
 
 				if event.key == pygame.K_a and not self.flopping and not self.ball:
 					self.flopping = True
