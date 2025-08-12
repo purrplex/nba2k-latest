@@ -294,6 +294,35 @@ class Player(pygame.sprite.Sprite):
 		self.frame_index = 0
 		self.direction = pygame.math.Vector2(0, 0)
 
+	def get_bot_with_ball(self):
+		for bot in self.opp_bots:
+			if bot.ball:
+				return bot
+				
+		return None
+
+	def bot_in_range(self, bot, radius=200):
+		return (bot.position - self.position).magnitude() < radius
+
+	def try_steal(self, radius, screen):
+		bot = self.get_bot_with_ball()
+		if not bot:
+			return False
+
+		can_steal = self.bot_in_range(bot, radius)
+		if can_steal:
+			self.frame_index = 0
+			self.ball = True
+			self.offensiveplay_screen(screen)
+			self.reset_position()
+			bot.ball = False
+			for bot in self.team_bots:
+				if bot != self:
+					bot.offensive_position()
+			for bot in self.opp_bots:
+					bot.offensive_position()
+			
+
 	def input(self, events, dt, screen):
 		for event in events:
 			if event.type == pygame.KEYUP:
@@ -314,19 +343,8 @@ class Player(pygame.sprite.Sprite):
 					self.passselecting = True
 					
 				elif event.key == pygame.K_d and not self.steal and not self.ball:
-						self.frame_index = 0
-						if bot.ball: 
-							dist = (bot.position - self.position).magnitude()
-							if dist < 5:
-								self.ball = True
-								self.offensiveplay_screen(screen)
-								self.reset_position()
-								bot.ball = False
-								for bot in self.team_bots:
-									if bot != self:
-										bot.offensive_position()
-								for bot in self.opp_bots:
-										bot.offensive_position()
+					radius = 200
+					self.try_steal(radius, screen)
 
 				if event.key == pygame.K_a and not self.flopping and not self.ball:
 					self.flopping = True
