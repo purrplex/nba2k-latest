@@ -306,6 +306,7 @@ class Player(pygame.sprite.Sprite):
 
 	def try_steal(self, radius, screen):
 		bot = self.get_bot_with_ball()
+		self.steal = True
 		if not bot:
 			return False
 
@@ -316,6 +317,7 @@ class Player(pygame.sprite.Sprite):
 			self.offensiveplay_screen(screen)
 			self.reset_position()
 			bot.ball = False
+			self.steal = True
 			for bot in self.team_bots:
 				if bot != self:
 					bot.offensive_position()
