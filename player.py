@@ -36,6 +36,7 @@ class Player(pygame.sprite.Sprite):
 		self.min_speed = 200
 		self.speed_decay = 100
 		
+		self.reach = None
 		self.love = True
 		self.shooting = False
 		self.shoottimer = False
@@ -311,7 +312,8 @@ class Player(pygame.sprite.Sprite):
 			return False
 
 		can_steal = self.bot_in_range(bot, radius)
-		if can_steal:
+		chance = random.randint(0,1)
+		if can_steal and chance != 1:
 			self.frame_index = 0
 			self.ball = True
 			self.offensiveplay_screen(screen)
@@ -323,6 +325,8 @@ class Player(pygame.sprite.Sprite):
 					bot.offensive_position()
 			for bot in self.opp_bots:
 					bot.offensive_position()
+		elif can_steal and chance == 1:
+			self.reach = True
 			
 
 	def input(self, events, dt, screen):
@@ -684,7 +688,7 @@ class Player(pygame.sprite.Sprite):
 				
 
 
-	def update(self, dt, events, screen, team, winner, selected_player, ):
+	def update(self, dt, events, screen, team, winner, selected_player, reach ):
 		if (self.team, self.selected_player) != (team, selected_player):
 			self.team = team
 			self.selected_player = selected_player
@@ -694,7 +698,7 @@ class Player(pygame.sprite.Sprite):
 		if self.shoottimer == True:
 			self.draw_shoot_meter(screen)
 
-	
+		self.reach = reach
 		self.winner = winner
 		self.input(events, dt, screen)
 		self.outOfBounds = False
@@ -704,5 +708,5 @@ class Player(pygame.sprite.Sprite):
 		self.fall = False
 		self.animate(dt)
 
-		return (self.outOfBounds, self.flopped, self.fall)
+		return (self.outOfBounds, self.flopped, self.fall, self.reach)
 
