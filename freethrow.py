@@ -26,12 +26,20 @@ class FreeThrow:
 			self.draw_ft_meter(screen)
 		elif self.ft_bar <= 0 or self.ft_bar >= 100:
 			self.draw_ft_result(screen)
-			if self.ft_bar >= 100:
-				self.shooter.shoot()
-				self.shooter_shot = True
-			if self.ft_bar <= 0:
-				self.shooter.shoot_miss()
-				self.shooter_shot = True
+			if self.game.offensiveplay:
+				if self.ft_bar >= 100:
+					self.shooter.shoot()
+					self.shooter_shot = True
+				if self.ft_bar <= 0:
+					self.shooter.shoot_miss()
+					self.shooter_shot = True
+			# elif self.game.deffensiveplay:
+			# 	if self.ft_bar >= 100:
+			# 		self.shooter.shoot_miss()
+			# 		self.shooter_shot = True
+			# 	if self.ft_bar <= 0:
+			# 		self.shooter.shoot()
+			# 		self.shooter_shot = True
 
 	def draw(self, screen):
 		self.game.all_sprites_group.customize_draw(
@@ -41,7 +49,6 @@ class FreeThrow:
 				self.game.qtr,
 				self.game.show_qtr,
 				self.game.show_score,
-
 			)
 
 		if not self.shooter_shot:
@@ -219,7 +226,7 @@ class FreeThrow:
 					if event.key == pygame.K_s:
 						self.show_instructions = False
 			if self.ft_bar > 0 and self.ft_bar < 100:
-				decrease_chance = random.randint(0,5)
+				decrease_chance = random.randint(0,1)
 				if self.ft_bar > 0 and self.ft_bar < 100:
 					self.ft_bar -= decrease_chance
 
