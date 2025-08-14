@@ -688,7 +688,7 @@ class Player(pygame.sprite.Sprite):
 				
 
 
-	def update(self, dt, events, screen, team, winner, selected_player, reach ):
+	def update(self, dt, events, screen, team, winner, selected_player):
 		if (self.team, self.selected_player) != (team, selected_player):
 			self.team = team
 			self.selected_player = selected_player
@@ -698,7 +698,7 @@ class Player(pygame.sprite.Sprite):
 		if self.shoottimer == True:
 			self.draw_shoot_meter(screen)
 
-		self.reach = reach
+		self.reach = False
 		self.winner = winner
 		self.input(events, dt, screen)
 		self.outOfBounds = False

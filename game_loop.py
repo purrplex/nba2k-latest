@@ -71,6 +71,7 @@ def game_loop(self):
 
 			else:
 				free_throw = False
+				reach = False
 				for bot in self.bots_group:
 					__, flop = bot.update(dt, self.screen, time, self.winner)
 					if flop:
@@ -81,7 +82,7 @@ def game_loop(self):
 					if sprite == self.player:
 						self.player.give_ball()
 
-				self.outOfBounds, flop, fall = self.player.update(
+				self.outOfBounds, flop, fall, reach = self.player.update(
 					dt,
 					events,
 					self.screen,
@@ -90,7 +91,7 @@ def game_loop(self):
 					self.selected_player,
 				)
 
-				if flop or fall or free_throw:
+				if flop or fall or free_throw or reach:
 					self.free_throw = True
 					if self.offensiveplay:
 						self.free_throw_shooter = self.player
