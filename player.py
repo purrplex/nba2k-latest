@@ -305,8 +305,8 @@ class Player(pygame.sprite.Sprite):
 		return (bot.position - self.position).magnitude() < radius
 
 	def try_steal(self, radius, screen):
-		bot = self.get_bot_with_ball()
 		self.steal = True
+		bot = self.get_bot_with_ball()
 		if not bot:
 			return False
 
