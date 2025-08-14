@@ -481,6 +481,7 @@ class TeamBots(pygame.sprite.Sprite):
 			ball_data['direction'] = (self.hoop['lakers'] - self.position).normalize()
 			
 			
+			
 		if action == "pass":
 			if target:
 				ball_data['direction'] = (self.bot.position - self.position).normalize()

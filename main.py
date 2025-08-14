@@ -459,6 +459,7 @@ class Game:
 					team,
 					bots[i],
 					self.outOfBounds,
+					self.create_basketball,
 				))
 
 			self.opp_bots_created = True

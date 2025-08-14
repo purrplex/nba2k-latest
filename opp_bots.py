@@ -6,7 +6,7 @@ from stats import PLAYER_STATS
 
 class OppBots(pygame.sprite.Sprite):
 
-	def __init__(self, pos, groups, player, team, selected_player, outOfBounds):
+	def __init__(self, pos, groups, player, team, selected_player, outOfBounds, create_basketball):
 		super().__init__(groups)
 		self.group = groups
 		self.player = player
@@ -20,11 +20,16 @@ class OppBots(pygame.sprite.Sprite):
 		self.position = vector(pos)
 		self.rect = None
 		self.outOfBounds = outOfBounds
+		self.create_basketball = create_basketball
+
 
 		self.import_assets()
 		self.animation = self.animations["idle"]
 		self.image = self.animation[self.frame_index]
 		self.rect = self.image.get_rect(center=pos)
+		self.hoop = {}
+		self.hoop['knicks'] = pygame.math.Vector2(1850,562)
+		self.hoop['lakers'] = pygame.math.Vector2(310,562)
 		
 		if selected_player in PLAYER_STATS:
 			self.stats = PLAYER_STATS[selected_player]
@@ -431,6 +436,35 @@ class OppBots(pygame.sprite.Sprite):
 			self.animation[int(self.frame_index)], (new_width, new_height)
 		)
 		self.rect = self.image.get_rect(center=self.rect.center)
+
+	def release_ball(self, action, target=None):
+		shootpower = abs(self.position.x - self.WINDOW_WIDTH/2)
+		shootpower = 1 - (shootpower/self.WINDOW_WIDTH/2)
+		shootpower = shootpower**4*4
+		shootpower += random.random()*0.5
+		ball_data = {
+			'player':self,
+			'shootpower':shootpower,
+			'action':action
+		}
+		
+		if self.status == "right":
+			ball_data['pos'] = (self.rect.topright[0] - 50, self.rect.topright[1] + 10)
+			ball_data['direction'] = (self.hoop['knicks'] - self.position).normalize()
+		elif self.status == "left":
+			ball_data['pos'] = (self.rect.topleft[0] + 50, self.rect.topleft[1] + 10)
+			ball_data['direction'] = (self.hoop['lakers'] - self.position).normalize()
+			
+			
+			
+		if action == "pass":
+			if target:
+				ball_data['direction'] = (self.bot.position - self.position).normalize()
+			
+		
+		self.create_basketball(ball_data)
+		self.basketball_created = True
+		self.ball = False
 		
 	def deffensive_position(self):
 		self.status = "left"
@@ -448,10 +482,24 @@ class OppBots(pygame.sprite.Sprite):
 		self.ball = True
 		self.basketball_created = False
 
+	def update_basketball(self, dt):
+		if not self.ball or self.basketball_created:
+			return
+		
+		if self.height == 0:
+			if random.random() > .99:
+				self.velocity = self.jump_speed
+				self.height = self.jump_start
+		
+		if self.height != 0:
+			if self.frame_index == len(self.animation) - 1:
+				self.release_ball("shoot")
+
 	def update(self, dt, screen, time, winner):
 		self.winner = winner
 		self.outOfBounds = True
 		self.move(dt, screen, time)
+		self.update_basketball(dt)
 		self.animate(dt)
 		self.opp_steal()
 
