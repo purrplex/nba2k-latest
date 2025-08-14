@@ -95,9 +95,10 @@ def game_loop(self):
 					self.free_throw = True
 					if self.offensiveplay:
 						self.free_throw_shooter = self.player
-					else:
+						self.FreeThrow.start(self.screen, self.player)
+					elif self.deffensiveplay:
 						self.free_throw_shooter = "kobe"
-					self.FreeThrow.start(self.screen, self.player)
+						self.FreeThrow.start(self.screen)
 					self.FreeThrow.end()
 					self.free_throw = False
 
