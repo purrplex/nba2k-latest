@@ -448,20 +448,13 @@ class OppBots(pygame.sprite.Sprite):
 			'action':action
 		}
 		
-		if self.status == "right":
-			ball_data['pos'] = (self.rect.topright[0] - 50, self.rect.topright[1] + 10)
+		if self.status == "left":
+			ball_data['pos'] = (self.rect.topleft[0] - 50, self.rect.topleft[1] + 10)
 			ball_data['direction'] = (self.hoop['knicks'] - self.position).normalize()
-		elif self.status == "left":
-			ball_data['pos'] = (self.rect.topleft[0] + 50, self.rect.topleft[1] + 10)
+		elif self.status == "right":
+			ball_data['pos'] = (self.rect.topright[0] + 50, self.rect.topright[1] + 10)
 			ball_data['direction'] = (self.hoop['lakers'] - self.position).normalize()
 			
-			
-			
-		if action == "pass":
-			if target:
-				ball_data['direction'] = (self.bot.position - self.position).normalize()
-			
-		
 		self.create_basketball(ball_data)
 		self.basketball_created = True
 		self.ball = False
