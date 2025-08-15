@@ -194,6 +194,7 @@ class TeamBots(pygame.sprite.Sprite):
 		self.deffensive = True
 
 	def offensive_position(self):
+		self.deffensive = False
 		self.status = "right"
 		self.speed = 0
 		self.position.x += 850

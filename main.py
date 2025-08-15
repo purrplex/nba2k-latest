@@ -307,8 +307,6 @@ class Game:
 			for bot in self.team_bots: 
 				if bot != self.player:
 					bot.offensive_position()
-					for pos in bot.target_pos:
-						pos = (bot.target_pos[0][0]-1200, bot.target_pos[0][1])
 			for pos in self.opp_bots:
 				pos.offensive_position()
 
