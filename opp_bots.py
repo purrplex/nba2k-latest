@@ -211,7 +211,10 @@ class OppBots(pygame.sprite.Sprite):
 					self.status = "left"
 				elif direction.x > 0:  # player to the right
 					self.direction.x = 1
-					self.status = "right"
+					self.status = "right"		
+			
+		if self.ball == True:
+			self.status = "left"
 
 	def move_to_player(self):
 		distance, direction = self.get_player_distance_direction()
