@@ -451,10 +451,10 @@ class OppBots(pygame.sprite.Sprite):
 			'action':action
 		}
 		
-		if self.status == "left":
+		if self.status == "right":
 			ball_data['pos'] = (self.rect.topleft[0] - 50, self.rect.topleft[1] + 10)
 			ball_data['direction'] = (self.hoop['knicks'] - self.position).normalize()
-		elif self.status == "right":
+		elif self.status == "left":
 			ball_data['pos'] = (self.rect.topright[0] + 50, self.rect.topright[1] + 10)
 			ball_data['direction'] = (self.hoop['lakers'] - self.position).normalize()
 			
@@ -465,13 +465,15 @@ class OppBots(pygame.sprite.Sprite):
 	def deffensive_position(self):
 		self.status = "left"
 		self.speed = 0
-		self.position.x -= 850
+		self.position = self.player.position.copy()	
+		self.position.x -= 120	
 		self.rect.center = round(self.position.x), round(self.position.y)	
 
 	def offensive_position(self):
 		self.status = "right"
 		self.speed = 0
-		self.position.x += 850
+		self.position = self.player.position.copy()
+		self.position.x += 120
 		self.rect.center = round(self.position.x), round(self.position.y)
 		
 	def give_ball(self):

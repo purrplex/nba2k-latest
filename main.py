@@ -288,18 +288,22 @@ class Game:
 		self.basketball = None
 		
 		closest = self.get_closest_bot(ball_pos)
-		self.give_ball(closest)
-		self.update_play(closest)
+		if self.offensiveplay:
+			self.give_ball(closest)
+			self.update_play(closest)
+		elif self.deffensiveplay:
+			self.give_ball(self.player)
+			self.update_play(self.player)
 
 	def update_play(self, player):
 		offense = isinstance(player, (TeamBots, Player))
-		if self.deffensiveplay == offense:
+		if self.deffensiveplay != offense:
 			return
 		self.offensiveplay = offense
 		self.deffensiveplay = not offense
 
 		if self.offensiveplay:
-			self.player.offensiveplay_screen(self.screen)
+			# self.player.offensiveplay_screen(self.screen)
 			for bot in self.team_bots: 
 				if bot != self.player:
 					bot.offensive_position()
@@ -307,11 +311,11 @@ class Game:
 						pos = (bot.target_pos[0][0]-1200, bot.target_pos[0][1])
 			for pos in self.opp_bots:
 				pos.offensive_position()
-			player.position = pygame.math.Vector2(500,500)
+
 		
 		if self.deffensiveplay:
 			self.player.deffensiveplay_screen(self.screen)
-			self.player.reset_position()
+			player.position = pygame.math.Vector2(500,500)
 			for bot in self.team_bots:
 				if bot != self.player: 
 					bot.deffensive_position()
@@ -324,8 +328,12 @@ class Game:
 		self.basketball = None
 		
 		closest = self.get_closest_bot(ball_pos)
-		self.give_ball(closest)
-		self.update_play(closest)
+		if self.offensiveplay:
+			self.give_ball(closest)
+			self.update_play(closest)
+		elif self.deffensiveplay:
+			self.give_ball(self.player)
+			self.update_play(self.player)
 
 		
 		

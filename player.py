@@ -189,10 +189,11 @@ class Player(pygame.sprite.Sprite):
 
 		self.direction = pygame.math.Vector2(1, 0)
 
-	def reset_position(self, x=1100, y=500):
+	def reset_position(self, x=1100, y=500, change_position=True):
+		if change_position:
+			self.position = pygame.math.Vector2(x, y)
 		self.status = "right"
 		self.speed = 0
-		self.position = pygame.math.Vector2(x, y)
 		self.rect.center = round(self.position.x), round(self.position.y)
 
 	def free_throw_init(self, x, y, shooter):
