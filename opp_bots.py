@@ -498,6 +498,7 @@ class OppBots(pygame.sprite.Sprite):
 		self.update_basketball(dt)
 		self.animate(dt)
 		self.opp_steal()
+		
 
 		if self.free_throw:
 			self.direction.x = 0

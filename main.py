@@ -55,7 +55,7 @@ class Game:
 		self.outOfBounds = False
 		self.outOfBounds2 = False
 		self.offensiveplay = True
-		self.deffensiveplay = None
+		self.deffensiveplay = False
 		self.inbounder_is_active = True
 		self.snap = False
 		self.menu = False
@@ -293,6 +293,8 @@ class Game:
 
 	def update_play(self, player):
 		offense = isinstance(player, (TeamBots, Player))
+		if self.deffensiveplay == offense:
+			return
 		self.offensiveplay = offense
 		self.deffensiveplay = not offense
 
@@ -300,8 +302,11 @@ class Game:
 			self.player.offensiveplay_screen(self.screen)
 			for bot in self.team_bots: 
 				if bot != self.player:
+					bot.offensive_position()
 					for pos in bot.target_pos:
 						pos = (bot.target_pos[0][0]-1200, bot.target_pos[0][1])
+			for pos in self.opp_bots:
+				pos.offensive_position()
 			player.position = pygame.math.Vector2(500,500)
 		
 		if self.deffensiveplay:
