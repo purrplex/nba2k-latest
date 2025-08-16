@@ -485,7 +485,7 @@ class OppBots(pygame.sprite.Sprite):
 			return
 		
 		if self.height == 0:
-			if random.random() > .99:
+			if random.random() > .996:
 				self.velocity = self.jump_speed
 				self.height = self.jump_start
 		

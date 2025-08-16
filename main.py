@@ -313,12 +313,12 @@ class Game:
 		
 		if self.deffensiveplay:
 			self.player.deffensiveplay_screen(self.screen)
-			player.position = pygame.math.Vector2(500,500)
 			for bot in self.team_bots:
 				if bot != self.player: 
 					bot.deffensive_position()
 			for bot in self.opp_bots:
 					bot.deffensive_position()
+			self.player.position = pygame.math.Vector2(300,500)
 
 	def basketball_rebound(self, pos):
 		self.FreeThrow.basketball_event('rebound')
