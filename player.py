@@ -676,11 +676,16 @@ class Player(pygame.sprite.Sprite):
 	def block_ball(self):
 		bot = self.get_bot_with_ball()
 		if not bot:
-			return
-		in_range = self.bot_in_range(bot)
+			return False
+		in_range = self.bot_in_range(bot,1000)
 
-		if not in_range:
-			return
+		if self.height == 0 or not in_range:
+			return False
+
+		detect_block_chance = 100
+		if random.random() < detect_block_chance / 100:
+			if self.velocity > 0 and bot.velocity > 0:
+				return True
 
 	def update_basketball(self):
 		if not self.ball or self.basketball_created:

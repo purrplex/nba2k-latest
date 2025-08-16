@@ -82,7 +82,7 @@ def game_loop(self):
 					if sprite == self.player:
 						self.player.give_ball()
 
-				self.outOfBounds, flop, fall, reach = self.player.update(
+				self.outOfBounds, flop, fall, reach, ball_blocked = self.player.update(
 					dt,
 					events,
 					self.screen,
@@ -90,6 +90,13 @@ def game_loop(self):
 					self.winner,
 					self.selected_player,
 				)
+
+				if ball_blocked:
+					block_type = 'FOUL'
+					if random.random() > 0.5:
+						block_type = 'TURNOVER'
+
+					self.show_text(block_type, self.WINDOW_WIDTH/2, 400, (255,255,0))
 
 				if flop or fall or free_throw or reach:
 					self.free_throw = True
