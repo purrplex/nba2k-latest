@@ -673,6 +673,15 @@ class Player(pygame.sprite.Sprite):
 		self.ball = True
 		self.basketball_created = False
 
+	def block_ball(self):
+		bot = self.get_bot_with_ball()
+		if not bot:
+			return
+		in_range = self.bot_in_range(bot)
+
+		if not in_range:
+			return
+
 	def update_basketball(self):
 		if not self.ball or self.basketball_created:
 			return
@@ -695,7 +704,6 @@ class Player(pygame.sprite.Sprite):
 			self.selected_player = selected_player
 			self.import_assets()
 			
-
 		if self.shoottimer == True:
 			self.draw_shoot_meter(screen)
 
@@ -708,6 +716,6 @@ class Player(pygame.sprite.Sprite):
 		self.flopped = False
 		self.fall = False
 		self.animate(dt)
-
-		return (self.outOfBounds, self.flopped, self.fall, self.reach)
+		self.ball_blocked = self.block_ball()
+		return (self.outOfBounds, self.flopped, self.fall, self.reach, self.ball_blocked)
 
