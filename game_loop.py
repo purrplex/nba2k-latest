@@ -26,6 +26,11 @@ def game_loop(self):
 
 		self.show_score()
 
+		if self.basketball:
+			self.basketball.update(dt)
+			
+		self.show_niceshot(dt)
+
 		if self.inbounder_is_active:
 			(
 				self.inbounder_is_active,
@@ -74,6 +79,8 @@ def game_loop(self):
 				reach = False
 				for bot in self.bots_group:
 					__, flop = bot.update(dt, self.screen, time, self.winner)
+					if bot.ball:
+							self.ball_holder = bot
 					if flop:
 						free_throw = True
 
@@ -93,10 +100,16 @@ def game_loop(self):
 
 				if ball_blocked:
 					block_type = 'FOUL'
-					if random.random() > 0.5:
+					if random.random() > 0.0:
 						block_type = 'TURNOVER'
 
 					self.show_text(block_type, self.WINDOW_WIDTH/2, 400, (255,255,0))
+					free_throw = block_type == 'FOUL'
+					if not free_throw:
+						if self.basketball:
+							self.basketball.remove()
+							self.basketball = None
+						self.update_play(self.player)
 
 				if flop or fall or free_throw or reach:
 					self.free_throw = True
@@ -121,18 +134,16 @@ def game_loop(self):
 					# 		self.offensiveplay = True
 					# 		self.deffensiveplay = False
 
-		if self.basketball:
-			self.basketball.update(dt)
-			
-		self.show_niceshot(dt)
-
 		if self.outOfBounds:
 			self.ball = False
 			self.snap = False
 			self.qtr += 1
 
-			 
-
 		pygame.display.update()
+		self.temp_ball_fix += dt
+		if not self.basketball and self.temp_ball_fix > 3:
+			self.temp_ball_fix = 0
+			if not self.ball_holder.ball:
+				self.give_ball(self.ball_holder)
 
 

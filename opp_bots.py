@@ -50,6 +50,12 @@ class OppBots(pygame.sprite.Sprite):
 		self.speed_decay = 100
 		self.steal_timer = pygame.time.get_ticks()
 
+		self.ball_timer = 0
+		self.action_time = 0
+		self.max_action_time = 3
+		self.min_action_time = 2
+		self.action_type = 'shoot'
+
 		self.stop = 0
 		self.ball = None
 		self.steal = False
@@ -479,19 +485,30 @@ class OppBots(pygame.sprite.Sprite):
 	def give_ball(self):
 		self.ball = True
 		self.basketball_created = False
+		self.ball_timer = 0
+		min_time = self.min_action_time
+		max_time = self.max_action_time - 1
+		self.action_time = random.randint(min_time, max_time) + random.random()
+		if random.random() < self.stats['shoot_chance'] / 100:
+			self.action_type = 'shoot'
+		else:
+			# TODO implement pass
+			self.action_type = 'shoot'
 
 	def update_basketball(self, dt):
+		self.ball_timer += dt
 		if not self.ball or self.basketball_created:
 			return
-		
-		if self.height == 0:
-			if random.random() > .996:
-				self.velocity = self.jump_speed
-				self.height = self.jump_start
 		
 		if self.height != 0:
 			if self.frame_index == len(self.animation) - 1:
 				self.release_ball("shoot")
+			return
+
+		if self.ball_timer > self.action_time:
+			if self.action_type == 'shoot':
+				self.velocity = self.jump_speed
+				self.height = self.jump_start
 
 	def update(self, dt, screen, time, winner):
 		self.winner = winner

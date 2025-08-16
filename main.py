@@ -34,6 +34,7 @@ from opp_bots import OppBots
 
 class Game:
 	def __init__(self):
+		self.temp_ball_fix = 0
 		pygame.init()
 		pygame.mixer.init()
 		self.WINDOW_WIDTH, self.WINDOW_HEIGHT = 1215, 812
@@ -269,7 +270,13 @@ class Game:
 		if self.free_throw:
 			return
 
+		if self.basketball:
+			self.basketball.remove()
+			self.basketball = None
+
 		player.give_ball()
+		self.ball_holder = player
+		self.temp_ball_fix = 0
 	
 	def basketball_scored(self, ball_info):
 		self.FreeThrow.basketball_event('score')
@@ -289,13 +296,12 @@ class Game:
 		
 		closest = self.get_closest_bot(ball_pos)
 		if self.offensiveplay:
-			self.give_ball(closest)
 			self.update_play(closest)
 		elif self.deffensiveplay:
-			self.give_ball(self.player)
 			self.update_play(self.player)
 
 	def update_play(self, player):
+		self.give_ball(player)
 		offense = isinstance(player, (TeamBots, Player))
 		if self.deffensiveplay != offense:
 			return
@@ -304,6 +310,8 @@ class Game:
 
 		if self.offensiveplay:
 			# self.player.offensiveplay_screen(self.screen)
+			if self.player.position.x < 1100:
+				self.player.position = pygame.math.Vector2(1100, 500)
 			for bot in self.team_bots: 
 				if bot != self.player:
 					bot.offensive_position()
@@ -313,12 +321,12 @@ class Game:
 		
 		if self.deffensiveplay:
 			self.player.deffensiveplay_screen(self.screen)
+			self.player.position = pygame.math.Vector2(300,500)
 			for bot in self.team_bots:
 				if bot != self.player: 
 					bot.deffensive_position()
 			for bot in self.opp_bots:
 					bot.deffensive_position()
-			self.player.position = pygame.math.Vector2(300,500)
 
 	def basketball_rebound(self, pos):
 		self.FreeThrow.basketball_event('rebound')
@@ -327,16 +335,16 @@ class Game:
 		
 		closest = self.get_closest_bot(ball_pos)
 		if self.offensiveplay:
-			self.give_ball(closest)
 			self.update_play(closest)
 		elif self.deffensiveplay:
-			self.give_ball(self.player)
 			self.update_play(self.player)
 
 		
 		
 	def basketball_catch(self, pos, player):
-		self.basketball = None
+		if self.basketball:
+			self.basketball.remove()
+			self.basketball = None
 		self.give_ball(player)
 		
 		

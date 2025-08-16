@@ -246,13 +246,11 @@ class Player(pygame.sprite.Sprite):
 			self.position.x = 20
 
 		if self.position.x > 2000 and not self.height != 0:
-			print('what')
 			self.outofbounds(screen, time)
 			self.reset_position()
 			self.direction.y = 0
 
 		if (self.position.y < 350 or self.position.y > 775) and not self.height != 0:
-			print(self.position.y)
 			self.outofbounds(screen, time)
 			self.reset_position()
 			self.direction.y = 0
@@ -670,8 +668,13 @@ class Player(pygame.sprite.Sprite):
 		#self.ball = False
 		
 	def give_ball(self):
+		self.height = 0
+		self.velocity = 0
+		self.frame_index = 0
 		self.ball = True
 		self.basketball_created = False
+		self.shoottimer = False
+		self.shooting = False
 
 	def block_ball(self):
 		bot = self.get_bot_with_ball()
