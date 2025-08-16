@@ -504,12 +504,13 @@ class Game:
 		self.screen.blit(score_surface, score_rect)
 
 	def show_text(self, text, x=0, y=0, color=(255,255,255)):
-		my_font = pygame.font.Font("images/font.ttf", 50)
-		text_surface = my_font.render(text, True, color
-		)
+		my_font = pygame.font.Font("images/font.ttf", 120)
+		text_surface = my_font.render(text, True, color)
 		text_rect = text_surface.get_rect()
 		text_rect.midtop = (x, y)
 		self.screen.blit(text_surface, text_rect)
+		pygame.display.flip()
+		time.sleep(1)
 
 
 	def show_passselectionscreenlogic(self, events):
