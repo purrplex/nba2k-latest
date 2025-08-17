@@ -198,6 +198,7 @@ class OppBots(pygame.sprite.Sprite):
 	def shoot(self):
 		if self.free_throw:
 			self.ball = True
+			self.shootpower = random.random() * 0.2 + 0.8
 			 
 		self.jump_sound.play()
 		self.velocity = self.jump_speed
@@ -210,6 +211,7 @@ class OppBots(pygame.sprite.Sprite):
 	def shoot_miss(self):
 		if self.free_throw:
 			self.ball = True
+			self.shootpower = random.random() * 0.5 + 0.9
 
 		self.jump_sound.play()
 		self.velocity = self.jump_speed
@@ -472,10 +474,13 @@ class OppBots(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect(center=self.rect.center)
 
 	def release_ball(self, action, target=None):
-		shootpower = abs(self.position.x - self.WINDOW_WIDTH/2)
-		shootpower = 1 - (shootpower/self.WINDOW_WIDTH/2)
-		shootpower = shootpower**4*4
-		shootpower += random.random()*0.5
+		if self.free_throw:
+			shootpower = self.shootpower
+		else:
+			shootpower = abs(self.position.x - self.WINDOW_WIDTH/2)
+			shootpower = 1 - (shootpower/self.WINDOW_WIDTH/2)
+			shootpower = shootpower**4*4
+			shootpower += random.random()*0.5
 		ball_data = {
 			'player':self,
 			'shootpower':shootpower,
