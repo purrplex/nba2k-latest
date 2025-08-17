@@ -667,7 +667,7 @@ class Player(pygame.sprite.Sprite):
 
 		self.create_basketball(ball_data)
 		self.basketball_created = True
-		#self.ball = False
+		# self.ball = True
 		
 	def give_ball(self):
 		self.ball = True

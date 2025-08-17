@@ -309,7 +309,7 @@ class Game:
 					bot.offensive_position()
 			for pos in self.opp_bots:
 				pos.offensive_position()
-
+ 
 		
 		if self.deffensiveplay:
 			self.player.deffensiveplay_screen(self.screen)

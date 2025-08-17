@@ -176,11 +176,6 @@ class OppBots(pygame.sprite.Sprite):
 		self.free_throw = True
 		self.direction.x = 0
 		self.direction.y = 0
-
-		# if self.offensiveplay:
-		# 	self.status = "right"
-		# if self.deffensiveplay:
-		# 	self.status = "left"
 		
 		self.direction = pygame.math.Vector2(0,0)
 		
@@ -496,7 +491,7 @@ class OppBots(pygame.sprite.Sprite):
 			
 		self.create_basketball(ball_data)
 		self.basketball_created = True
-		self.ball = False
+		# self.ball = False
 		
 	def deffensive_position(self):
 		self.status = "left"
