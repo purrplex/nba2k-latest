@@ -177,8 +177,16 @@ class OppBots(pygame.sprite.Sprite):
 		self.direction.x = 0
 		self.direction.y = 0
 
+		# if self.offensiveplay:
+		# 	self.status = "right"
+		# if self.deffensiveplay:
+		# 	self.status = "left"
+		
+		self.direction = pygame.math.Vector2(0,0)
+		
 		if self == shooter:
 			self.ball = True
+			self.status = "left"
 		else:
 			self.ball = False
 
