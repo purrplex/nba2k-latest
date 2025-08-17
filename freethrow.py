@@ -33,13 +33,13 @@ class FreeThrow:
 				if self.ft_bar <= 0:
 					self.shooter.shoot_miss()
 					self.shooter_shot = True
-			# elif self.game.deffensiveplay:
-			# 	if self.ft_bar >= 100:
-			# 		self.shooter.shoot_miss()
-			# 		self.shooter_shot = True
-			# 	if self.ft_bar <= 0:
-			# 		self.shooter.shoot()
-			# 		self.shooter_shot = True
+			elif self.game.deffensiveplay:
+				if self.ft_bar >= 100:
+					self.shooter.shoot_miss()
+					self.shooter_shot = True
+				if self.ft_bar <= 0:
+					self.shooter.shoot()
+					self.shooter_shot = True
 
 	def draw(self, screen):
 		self.game.all_sprites_group.customize_draw(
@@ -171,14 +171,23 @@ class FreeThrow:
 		screen.blit(speed_surface, speed_rect)		
 
 	def draw_ft_result(self, screen):
-		my_font = pygame.font.Font("images/font.ttf", 70)
-		if self.ft_bar <= 0:
-			speed_surface = my_font.render("MISS", True, pygame.Color(255, 255, 255))
-		if self.ft_bar >= 100:
-			speed_surface = my_font.render("NICE SHOT", True, pygame.Color(255, 255, 255))
-		speed_rect = speed_surface.get_rect()
-		speed_rect.midtop = (400, 100)
-		screen.blit(speed_surface, speed_rect)		
+		my_font = pygame.font.Font("images/font.ttf", 80)
+		speed_surface = None
+
+		if self.ft_bar <= 0 and self.game.offensiveplay:
+			speed_surface = my_font.render("SHOT MISSED", True, pygame.Color(255, 0, 0))
+		if self.ft_bar >= 100 and self.game.offensiveplay:
+			speed_surface = my_font.render("NICE SHOT", True, pygame.Color(0, 255, 0))
+
+		if self.ft_bar <= 100 and self.game.deffensiveplay:
+			speed_surface = my_font.render("SHOT MISSED", True, pygame.Color(0, 255, 0))
+		if self.ft_bar >= 0 and self.game.deffensiveplay:
+			speed_surface = my_font.render("SHOT IS GOOD", True, pygame.Color(255, 0, 0))
+
+		if speed_surface:
+			speed_rect = speed_surface.get_rect()
+			speed_rect.midtop = (400, 100)
+			screen.blit(speed_surface, speed_rect)		
 
 	def end(self):
 		for bot in self.game.team_bots:

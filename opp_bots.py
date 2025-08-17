@@ -195,6 +195,29 @@ class OppBots(pygame.sprite.Sprite):
 		self.position = self.player.position.copy()
 		self.position.x += 120
 
+	def shoot(self):
+		if self.free_throw:
+			self.ball = True
+			 
+		self.jump_sound.play()
+		self.velocity = self.jump_speed
+		self.height = self.jump_start
+		self.basketball_created = False
+		self.frame_index = 0
+		self.direction = pygame.math.Vector2(0, 0)
+
+
+	def shoot_miss(self):
+		if self.free_throw:
+			self.ball = True
+
+		self.jump_sound.play()
+		self.velocity = self.jump_speed
+		self.height = self.jump_start
+		self.basketball_created = False
+		self.frame_index = 0
+		self.direction = pygame.math.Vector2(0, 0)
+
 	def get_player_distance_direction(self):
 		enemy_pos = vector(self.rect.center)
 		player_pos = vector(self.player.rect.center)
