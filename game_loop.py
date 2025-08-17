@@ -108,18 +108,7 @@ def game_loop(self):
 						self.FreeThrow.start(self.screen, self.opp_bots[0])
 					self.FreeThrow.end()
 					self.free_throw = False
-
-					# if self.offensiveplay == True:
-					# 	self.free_throw = True
-					# 	self.free_throw_shooter = self.player
-					# 	self.FreeThrow.start(self.screen, self.player)
-					# 	self.free_throw = False
-					# else: 
-					# 	chance = random.randint(0,20)
-					# 	print(chance)
-					# 	if chance == 19:
-					# 		self.offensiveplay = True
-					# 		self.deffensiveplay = False
+					self.give_ball(self.player)
 
 		if self.basketball:
 			self.basketball.update(dt)
