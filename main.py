@@ -258,6 +258,7 @@ class Game:
 		self.ball_scored_pos = None
 		self.ball_rebound_pos = None
 		self.animation_wait_timer = 0
+		self.same_team_count = 0
 
 	# Functions
 	
@@ -355,14 +356,18 @@ class Game:
 		self.give_ball(player)
 
 	def finish_rebound(self):
-		print('rebound')
 		self.FreeThrow.basketball_event('rebound')
-		
-		closest = self.get_closest_bot(self.ball_rebound_pos)
+
+		if self.same_team_count > 3:
+			closest = random.choice(self.opp_bots)
+			self.same_team_count = 0
+		else:
+			closest = self.get_closest_bot(self.ball_rebound_pos)
 		if self.offensiveplay:
+			self.same_team_count += 1
 			self.update_play(closest)
 		elif self.deffensiveplay:
-			self.update_play(self.player)
+			self.update_play(self.player, True)
 
 		self.ball_rebound_pos = None
 		if self.basketball:

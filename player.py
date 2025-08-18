@@ -312,12 +312,11 @@ class Player(pygame.sprite.Sprite):
 
 		can_steal = self.bot_in_range(bot, radius)
 		chance = random.randint(0,1)
-		if can_steal and chance != 1:
-			self.frame_index = 0
-			self.steal = True
-		elif can_steal and chance == 1:
+		if can_steal and chance == 1:
 			self.reach = True
-			
+
+		self.frame_index = 0
+		self.steal = True	
 
 	def input(self, events, dt, screen):
 		for event in events:
@@ -449,7 +448,10 @@ class Player(pygame.sprite.Sprite):
 			self.basketball_created = True
 			self.ball = False
 		elif self.steal:
-			self.return_action = 'steal'
+			bot = self.get_bot_with_ball()
+			can_steal = self.bot_in_range(bot, radius=200)
+			if can_steal:
+				self.return_action = 'steal'
 			# bot.take_ball()
 
 		if self.reach:

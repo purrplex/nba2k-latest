@@ -122,7 +122,7 @@ def game_loop(self):
 						self.FreeThrow.start(self.screen, self.opp_bots[0])
 					self.FreeThrow.end()
 					self.free_throw = False
-					self.update_play(self.player)
+					self.update_play(self.player, True)
 
 		if self.basketball:
 			self.basketball.update(dt)
