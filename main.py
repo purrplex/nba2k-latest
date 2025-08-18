@@ -321,8 +321,11 @@ class Game:
 		self.niceshot_timer = self.niceshot_timer_dur
 		self.ball_scored_info = ball_info
 		self.ball_scored_pos = self.basketball.pos.copy()
+		
+		if self.free_throw:
+			self.finish_scored()
 
-	def update_play(self, player):
+	def update_play(self, player, show_offense_screen=False):
 		offense = isinstance(player, (TeamBots, Player))
 		if self.ball_holder and self.deffensiveplay != offense:
 			self.give_ball(player)
@@ -331,7 +334,8 @@ class Game:
 		self.deffensiveplay = not offense
 
 		if self.offensiveplay:
-			# self.player.offensiveplay_screen(self.screen)
+			if show_offense_screen:
+				self.player.offensiveplay_screen(self.screen)
 			for bot in self.team_bots: 
 				if bot != self.player:
 					bot.offensive_position()
@@ -371,6 +375,9 @@ class Game:
 		if self.ball_rebound_pos:
 			return
 		self.ball_rebound_pos = self.basketball.pos.copy()
+
+		if self.free_throw:
+			self.finish_rebound()
 		
 	def basketball_catch(self, pos, player):
 		self.update_play(player)

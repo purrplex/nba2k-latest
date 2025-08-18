@@ -315,12 +315,6 @@ class Player(pygame.sprite.Sprite):
 		if can_steal and chance != 1:
 			self.frame_index = 0
 			self.steal = True
-			self.offensiveplay_screen(screen)
-			for bot in self.team_bots:
-				if bot != self:
-					bot.offensive_position()
-			for bot in self.opp_bots:
-					bot.offensive_position()
 		elif can_steal and chance == 1:
 			self.reach = True
 			
@@ -455,20 +449,23 @@ class Player(pygame.sprite.Sprite):
 			self.basketball_created = True
 			self.ball = False
 		elif self.steal:
-			bot = self.get_bot_with_ball()
-			self.give_ball()
+			self.return_action = 'steal'
 			# bot.take_ball()
 
+		if self.reach:
+			self.return_action = 'reach'
+			
 		if self.flopping:
-			self.flopped = True
+			self.return_action = 'flop'
 
 		if self.falling:
-			self.fall = True
+			self.return_action = 'fall'
 
 		self.steal = False
 		self.landing = False
 		self.flopping = False
 		self.falling = False
+		self.reach = False
 
 	def apply_scale(self):
 		# Applys the scale factor to the image
@@ -724,15 +721,15 @@ class Player(pygame.sprite.Sprite):
 		if self.shoottimer == True:
 			self.draw_shoot_meter(screen)
 
-		self.reach = False
 		self.winner = winner
+		self.return_action = 'none'
 		self.input(events, dt, screen)
 		self.outOfBounds = False
 		self.move(dt, screen)
 		#self.update_basketball()
-		self.flopped = False
-		self.fall = False
 		self.animate(dt)
 		self.ball_blocked = self.block_ball()
-		return (self.outOfBounds, self.flopped, self.fall, self.reach, self.ball_blocked)
+		if self.ball_blocked:
+			self.return_action = 'block'
+		return (self.outOfBounds, self.return_action)
 
