@@ -47,6 +47,7 @@ class Player(pygame.sprite.Sprite):
 		self.passing = False
 		self.passselecting = None
 		self.steal = False
+		self.steal_attempt = False
 		self.stealing = False
 		self.steal_radius = 250
 		self.landing = None
@@ -325,7 +326,7 @@ class Player(pygame.sprite.Sprite):
 					self.passselecting = True
 					
 				elif event.key == pygame.K_d and not self.steal and not self.ball:
-					radius = self.steal_radius
+					radius = 200
 					self.try_steal(radius, screen)
 
 				if event.key == pygame.K_a and not self.flopping and not self.ball:
@@ -452,6 +453,7 @@ class Player(pygame.sprite.Sprite):
 			self.return_action = 'fall'
 
 		self.steal = False
+		self.steal_attempt = False
 		self.landing = False
 		self.flopping = False
 		self.falling = False
@@ -551,7 +553,7 @@ class Player(pygame.sprite.Sprite):
 						self.animation = self.animations["idle"]
 						self.direction.x = 0
 
-					if self.steal:
+					if self.steal or self.steal_attempt:
 						self.animation = self.animations["steal"]
 
 					if self.flopping:
