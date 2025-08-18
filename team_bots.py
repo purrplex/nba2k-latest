@@ -289,6 +289,7 @@ class TeamBots(pygame.sprite.Sprite):
 			self.face_player()
 			self.move_to_position()
 		elif self.ball:
+			self.move_to_position()
 			self.status = "right"
 
 		# Gradually decrease speed

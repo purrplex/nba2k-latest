@@ -275,6 +275,7 @@ class OppBots(pygame.sprite.Sprite):
 			self.face_player()
 			self.move_to_player()
 		elif self.ball:
+			self.move_to_player()
 			self.status = "left"
 
 		# Gradually decrease speed
