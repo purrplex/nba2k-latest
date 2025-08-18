@@ -50,6 +50,7 @@ class Basketball(pygame.sprite.Sprite):
 		self.speed = 400
 		self.menu = False
 		self.collision_state = None
+		self.ball_done = False
 		self.bounces = 0
 		self.hoop_bounces = 0
 		self.backboard = {}
@@ -83,18 +84,23 @@ class Basketball(pygame.sprite.Sprite):
 			group.remove(self)
 		
 	def scored(self):
-		self.remove()
 		ball_info = {
 			'player':self.player,
 			'side':self.scored_side
 		}
 		difference_vec = (self.start_pos - self.hoop_coords[self.scored_side])
 		ball_info['distance'] = difference_vec
+		self.pos = self.hoop_coords[self.scored_side]
+		self.pos.y += 20
+		self.direction.x = 0
+		self.direction.y = -0.02
+		self.gravity = -500
 		self.on_score(ball_info)
+		self.ball_done = True
 	
 	def rebound(self):
-		self.remove()
 		self.on_rebound(pygame.math.Vector2(self.pos.x, self.pos.y - self.height))
+		self.ball_done = True
 		
 	def catch(self, players):
 		self.remove()
@@ -136,8 +142,9 @@ class Basketball(pygame.sprite.Sprite):
 		hoop_distance = (self.hoop_coords[self.scored_side] - ball_pos).magnitude()
 		if hoop_distance > 45:
 			return
-		
-		self.scored()
+
+		if not self.ball_done:
+			self.scored()
 		
 	def handle_shooting(self, dt):
 		
@@ -203,7 +210,6 @@ class Basketball(pygame.sprite.Sprite):
 		else:
 			self.handle_catch()
 
-		if self.bounces >= 1:
+		if not self.ball_done and self.bounces >= 1:
 			self.rebound()
 #
-
