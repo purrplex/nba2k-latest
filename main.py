@@ -222,6 +222,8 @@ class Game:
 		]
 
 		# images/sounds
+		self.music_on = False
+		self.music_toggle_anim_time = -1
 		self.start_music = pygame.mixer.Sound("images/sounds/start.ogg")
 		self.start_music.set_volume(0.2)
 
@@ -250,7 +252,8 @@ class Game:
 		self.background = None
 		self.transparent_background = Background().generate_background()
 		
-		self.ball_holder = self.player
+		self.ball_holder = None
+		self.ball_holder_updated = None
 
 	# Functions
 	
@@ -269,7 +272,17 @@ class Game:
 		if self.free_throw:
 			return
 
+		if self.basketball:
+			self.basketball.remove()
+			self.basketball = None
+
+		if self.ball_holder:
+			if self.ball_holder.ball:
+				self.ball_holder.take_ball()
+
 		player.give_ball()
+		self.ball_holder = player
+		self.ball_holder_updated = True
 	
 	def basketball_scored(self, ball_info):
 		self.FreeThrow.basketball_event('score')
@@ -289,15 +302,14 @@ class Game:
 		
 		closest = self.get_closest_bot(ball_pos)
 		if self.offensiveplay:
-			self.give_ball(closest)
 			self.update_play(closest)
 		elif self.deffensiveplay:
-			self.give_ball(self.player)
 			self.update_play(self.player)
 
 	def update_play(self, player):
 		offense = isinstance(player, (TeamBots, Player))
-		if self.deffensiveplay != offense:
+		if self.ball_holder and self.deffensiveplay != offense:
+			self.give_ball(player)
 			return
 		self.offensiveplay = offense
 		self.deffensiveplay = not offense
@@ -320,6 +332,8 @@ class Game:
 					bot.deffensive_position()
 			self.player.position = pygame.math.Vector2(300,500)
 
+		self.give_ball(player)
+
 	def basketball_rebound(self, pos):
 		self.FreeThrow.basketball_event('rebound')
 		ball_pos = self.basketball.pos.copy()
@@ -327,17 +341,14 @@ class Game:
 		
 		closest = self.get_closest_bot(ball_pos)
 		if self.offensiveplay:
-			self.give_ball(closest)
 			self.update_play(closest)
 		elif self.deffensiveplay:
-			self.give_ball(self.player)
 			self.update_play(self.player)
-
 		
 		
 	def basketball_catch(self, pos, player):
 		self.basketball = None
-		self.give_ball(player)
+		self.update_play(player)
 		
 		
 	def create_basketball(self, data):
@@ -349,6 +360,55 @@ class Game:
 		data['catch'] = self.basketball_catch
 		data['group'] = self.all_sprites_group
 		self.basketball = Basketball(data)
+
+	def draw_sound_toggle(self, dt, mouse):
+		toggle_x = 90
+		toggle_y = self.WINDOW_HEIGHT - 40
+		button_width = 50
+		button_height = 30
+		font_size = 35
+		off_color_bg = 'grey'
+		on_color_bg = 'green'
+		off_color_switch = 'white'
+		on_color_switch = 'white'
+		switch_anim_time = 80 # milliseconds
+
+		if mouse:
+			if mouse[0] > toggle_x and mouse[0] < toggle_x + button_width:
+				if mouse[1] > toggle_y and mouse[1] < toggle_y + button_height:
+					self.music_on = not self.music_on
+					if self.music_on:
+						self.music_toggle_anim_time = 0
+					else:
+						self.music_toggle_anim_time = 1
+
+		# SCORE text
+		my_font = pygame.font.Font("images/font.ttf", font_size)
+		font_surface = my_font.render("MUSIC", True, "white")
+		font_rect = font_surface.get_rect()
+		font_rect.midtop = (toggle_x - font_size - 5, toggle_y)
+		self.screen.blit(font_surface, font_rect)
+		
+		# toggle button
+		anim_mult = 1/(switch_anim_time/1000)
+		if self.music_on:
+			if self.music_toggle_anim_time < 1:
+				self.music_toggle_anim_time += anim_mult * dt
+			else:
+				self.music_toggle_anim_time = 1
+			pygame.draw.rect(self.screen, on_color_bg,(toggle_x, toggle_y, button_width, button_height))
+			anim_pos_x = toggle_x + self.music_toggle_anim_time * (button_width - button_height)
+			pygame.draw.rect(self.screen, on_color_switch, (anim_pos_x+4, toggle_y+4, button_height-8, button_height-8))
+			self.game_music.set_volume(0.2)
+		else:
+			if self.music_toggle_anim_time > 0:
+				self.music_toggle_anim_time -= anim_mult * dt
+			else:
+				self.music_toggle_anim_time = 0
+			pygame.draw.rect(self.screen, off_color_bg, (toggle_x, toggle_y, button_width, button_height))
+			anim_pos_x = toggle_x + (self.music_toggle_anim_time * (button_width - button_height))
+			pygame.draw.rect(self.screen, on_color_switch, (anim_pos_x+4, toggle_y+4, button_height-8, button_height-8))
+			self.game_music.set_volume(0.0)
 
 	def show_niceshot(self, dt):
 		if self.niceshot_timer <= 0:
@@ -534,9 +594,9 @@ class Game:
 				elif event.key == pygame.K_RETURN or event.key == pygame.K_SPACE: 
 					bot = self.team_bots[self.passto_selected_index]
 					self.player.bot = bot
-					bot.ball = True
-					self.player.ball = False
+					self.update_play(bot)
 					self.player.passselecting = False
+					self.passto_selected_index = 0
 
 		bot = self.team_bots[self.passto_selected_index]
 		if bot == self.player:
@@ -673,7 +733,7 @@ class Game:
 		continue_menu(self)
 
 	def run(self):
-		self.player.give_ball()
+		self.update_play(self.player)
 		self.game_loop()
 		self.start_menu()
 

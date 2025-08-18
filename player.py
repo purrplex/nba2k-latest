@@ -40,7 +40,7 @@ class Player(pygame.sprite.Sprite):
 		self.love = True
 		self.shooting = False
 		self.shoottimer = False
-		self.ball = None
+		self.ball = False
 		self.pass_steal = False
 		self.passing = False
 		self.passselecting = None
@@ -246,7 +246,6 @@ class Player(pygame.sprite.Sprite):
 			self.position.x = 20
 
 		if self.position.x > 2000 and not self.height != 0:
-			print('what')
 			self.outofbounds(screen, time)
 			self.reset_position()
 			self.direction.y = 0
@@ -307,7 +306,6 @@ class Player(pygame.sprite.Sprite):
 		return (bot.position - self.position).magnitude() < radius
 
 	def try_steal(self, radius, screen):
-		self.steal = True
 		bot = self.get_bot_with_ball()
 		if not bot:
 			return False
@@ -316,10 +314,6 @@ class Player(pygame.sprite.Sprite):
 		chance = random.randint(0,1)
 		if can_steal and chance != 1:
 			self.frame_index = 0
-			self.ball = True
-			self.offensiveplay_screen(screen)
-			self.reset_position()
-			bot.ball = False
 			self.steal = True
 			for bot in self.team_bots:
 				if bot != self:
@@ -460,7 +454,9 @@ class Player(pygame.sprite.Sprite):
 			self.basketball_created = True
 			self.ball = False
 		elif self.steal:
-			pass
+			bot = self.get_bot_with_ball()
+			self.give_ball()
+			bot.take_ball()
 
 		if self.flopping:
 			self.flopped = True
@@ -668,10 +664,25 @@ class Player(pygame.sprite.Sprite):
 		self.create_basketball(ball_data)
 		self.basketball_created = True
 		# self.ball = True
+
+	def update_ball_state(self):
+		self.height = 0
+		self.velocity = 0
+		self.direction = pygame.math.Vector2(0,0)
+		self.frame_index = 0
+		self.speed = 0
+		self.steal = False
+		self.passing = False
 		
 	def give_ball(self):
 		self.ball = True
 		self.basketball_created = False
+		self.update_ball_state()
+
+	def take_ball(self):
+		self.ball = False
+		self.basketball_created = False
+		self.update_ball_state()
 
 	def block_ball(self):
 		bot = self.get_bot_with_ball()
