@@ -39,7 +39,7 @@ def game_loop(self):
 
 			self.inbounder.snap_throw_instructions(self.screen)
 
-			colliding_sprites = self.testball.update() + self.testball2.update()
+			# colliding_sprites = self.testball.update() + self.testball2.update()
 
 		else:
 
@@ -77,10 +77,11 @@ def game_loop(self):
 					if flop:
 						free_throw = True
 
-				colliding_sprites = self.testball.update() + self.testball2.update()
-				for sprite in colliding_sprites:
-					if sprite == self.player:
-						self.player.give_ball()
+				# colliding_sprites = self.testball.update() + self.testball2.update()
+
+				# for sprite in colliding_sprites:
+				# 	if sprite == self.player:
+				# 		self.player.give_ball()
 
 				self.outOfBounds, flop, fall, reach, ball_blocked = self.player.update(
 					dt,
