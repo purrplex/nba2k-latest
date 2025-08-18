@@ -80,6 +80,7 @@ def game_loop(self):
 					__, flop = bot.update(dt, self.screen, time, self.winner)
 					if flop:
 						free_throw = True
+
 					if bot.ball:
 						ball_holder = bot
 				# colliding_sprites = self.testball.update() + self.testball2.update()
