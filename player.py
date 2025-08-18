@@ -315,6 +315,7 @@ class Player(pygame.sprite.Sprite):
 		if can_steal and chance != 1:
 			self.frame_index = 0
 			self.steal = True
+			self.offensiveplay_screen(screen)
 			for bot in self.team_bots:
 				if bot != self:
 					bot.offensive_position()
@@ -456,7 +457,7 @@ class Player(pygame.sprite.Sprite):
 		elif self.steal:
 			bot = self.get_bot_with_ball()
 			self.give_ball()
-			bot.take_ball()
+			# bot.take_ball()
 
 		if self.flopping:
 			self.flopped = True
