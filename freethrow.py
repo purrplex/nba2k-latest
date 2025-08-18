@@ -245,6 +245,5 @@ class FreeThrow:
 
 			if self.game.basketball:
 				self.game.basketball.update(dt)
-	
 
 			self.draw(screen)
