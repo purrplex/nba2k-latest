@@ -335,8 +335,8 @@ class Game:
 		self.give_ball(player)
 
 	def basketball_rebound(self, pos):
-		self.FreeThrow.basketball_event('rebound')
 		ball_pos = self.basketball.pos.copy()
+		self.FreeThrow.basketball_event('rebound')
 		self.basketball = None
 		
 		closest = self.get_closest_bot(ball_pos)
