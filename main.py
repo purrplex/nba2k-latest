@@ -254,6 +254,10 @@ class Game:
 		
 		self.ball_holder = None
 		self.ball_holder_updated = None
+		self.ball_scored_info = None
+		self.ball_scored_pos = None
+		self.ball_rebound_pos = None
+		self.animation_wait_timer = 0
 
 	# Functions
 	
@@ -283,28 +287,40 @@ class Game:
 		player.give_ball()
 		self.ball_holder = player
 		self.ball_holder_updated = True
-	
-	def basketball_scored(self, ball_info):
+
+	def finish_scored(self):
+		print('scored')
 		self.FreeThrow.basketball_event('score')
-		three_pointer = abs(ball_info.get('distance').x) > 450
+		three_pointer = abs(self.ball_scored_info.get('distance').x) > 450
 		point_value = 2
 		if three_pointer:
 			point_value = 3
 			
-		if ball_info.get('side') == "left":
+		if self.ball_scored_info.get('side') == "left":
 			self.score[1] += point_value
 		else:
 			self.score[0] += point_value
-		self.niceshot_timer = self.niceshot_timer_dur
 		
-		ball_pos = self.basketball.pos.copy()
-		self.basketball = None
-		
-		closest = self.get_closest_bot(ball_pos)
+		closest = self.get_closest_bot(self.ball_scored_pos)
 		if self.offensiveplay:
 			self.update_play(closest)
 		elif self.deffensiveplay:
 			self.update_play(self.player)
+
+		self.ball_scored_info = None
+		self.ball_scored_pos = None
+		if self.basketball:
+			self.basketball.remove()
+			self.basketball = None
+	
+	def basketball_scored(self, ball_info):
+		self.ball_rebound_pos = None
+		self.basketball.direction = pygame.math.Vector2(0,0)
+		if self.ball_scored_info:
+			return
+		self.niceshot_timer = self.niceshot_timer_dur
+		self.ball_scored_info = ball_info
+		self.ball_scored_pos = self.basketball.pos.copy()
 
 	def update_play(self, player):
 		offense = isinstance(player, (TeamBots, Player))
@@ -334,22 +350,33 @@ class Game:
 
 		self.give_ball(player)
 
-	def basketball_rebound(self, pos):
-		ball_pos = self.basketball.pos.copy()
+	def finish_rebound(self):
+		print('rebound')
 		self.FreeThrow.basketball_event('rebound')
-		self.basketball = None
 		
-		closest = self.get_closest_bot(ball_pos)
+		closest = self.get_closest_bot(self.ball_rebound_pos)
 		if self.offensiveplay:
 			self.update_play(closest)
 		elif self.deffensiveplay:
 			self.update_play(self.player)
-		
+
+		self.ball_rebound_pos = None
+		if self.basketball:
+			self.basketball.remove()
+			self.basketball = None
+
+	def basketball_rebound(self, pos):
+		self.ball_scored_info = None
+		self.ball_scored_pos = None
+		if self.ball_rebound_pos:
+			return
+		self.ball_rebound_pos = self.basketball.pos.copy()
 		
 	def basketball_catch(self, pos, player):
-		self.basketball = None
 		self.update_play(player)
-		
+		if self.basketball:
+			self.basketball.remove()
+			self.basketball = None
 		
 	def create_basketball(self, data):
 		if self.basketball:

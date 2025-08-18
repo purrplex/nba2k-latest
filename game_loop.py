@@ -133,6 +133,18 @@ def game_loop(self):
 			self.snap = False
 			self.qtr += 1
 
+		if self.ball_scored_info:
+			self.animation_wait_timer += dt
+			if self.animation_wait_timer > 1.2:
+				self.animation_wait_timer = 0
+				self.finish_scored()
+
+		if self.ball_rebound_pos:
+			self.animation_wait_timer += dt
+			if self.animation_wait_timer > 0.5:
+				self.animation_wait_timer = 0
+				self.finish_rebound()
+
 
 		self.draw_sound_toggle(dt, mouse)
 		pygame.display.update()
