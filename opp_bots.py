@@ -50,8 +50,15 @@ class OppBots(pygame.sprite.Sprite):
 		self.speed_decay = 100
 		self.steal_timer = pygame.time.get_ticks()
 
+		self.ball_timer = 0
+		self.action_time = 0
+		self.max_action_time = 6
+		self.min_action_time = 3
+		self.action_type = 'shoot'
+
 		self.stop = 0
 		self.ball = None
+		self.basketball_created = False
 		self.steal = False
 		self.pass_steal = False
 		self.stealing = False
@@ -240,9 +247,6 @@ class OppBots(pygame.sprite.Sprite):
 				elif direction.x > 0:  # player to the right
 					self.direction.x = 1
 					self.status = "right"		
-			
-		if self.ball == True:
-			self.status = "left"
 
 	def move_to_player(self):
 		distance, direction = self.get_player_distance_direction()
@@ -267,9 +271,12 @@ class OppBots(pygame.sprite.Sprite):
 				self.delay = random.random()*0.1 + 0.1
 				self.delay_move_timer = 0
 				self.delay_move = False
-		elif not self.free_throw:
+		elif not self.free_throw and not self.ball:
 			self.face_player()
 			self.move_to_player()
+		elif self.ball:
+			self.move_to_player()
+			self.status = "left"
 
 		# Gradually decrease speed
 		if self.speed > self.min_speed:
@@ -317,22 +324,21 @@ class OppBots(pygame.sprite.Sprite):
 	def opp_steal(self):
 		if self.free_throw:
 			return
+			
 		st_elapsed = pygame.time.get_ticks() - self.steal_timer
-		if st_elapsed == 0:
-			self.steal = False
-		if  st_elapsed >= 5000:
-			if random.random() < 0.1:
-				self.steal = True
-			else:
-				self.steal = False
+		if st_elapsed >= 5000:
+			if random.random() < 0.1 and not self.steal:
+				if self.player.ball:
+					self.steal = True
+					self.frame_index = 0
 			self.steal_timer = pygame.time.get_ticks()
 
 	def animation_done(self):
 		if self.steal:
 			self.steal = False
 			if self.player.ball:
-				self.player.ball = False
-				self.ball = True
+				self.player.take_ball()
+				self.give_ball()
 
 		if self.flopping:
 			self.flopped = True
@@ -506,23 +512,50 @@ class OppBots(pygame.sprite.Sprite):
 		self.position = self.player.position.copy()
 		self.position.x += 120
 		self.rect.center = round(self.position.x), round(self.position.y)
+
+	def update_ball_state(self):
+		self.height = 0
+		self.velocity = 0
+		self.direction = pygame.math.Vector2(0,0)
+		self.frame_index = 0
+		self.speed = 0
+		self.steal = False
+		self.passing = False
 		
 	def give_ball(self):
 		self.ball = True
 		self.basketball_created = False
+		self.update_ball_state()
+
+		self.ball_timer = 0
+		min_time = self.min_action_time
+		max_time = self.max_action_time - 1
+		self.action_time = random.randint(min_time, max_time) + random.random()
+		if random.random() < self.stats['shoot_chance'] / 100:
+			self.action_type = 'shoot'
+		else:
+			# TODO implement pass
+			self.action_type = 'shoot'
+
+	def take_ball(self):
+		self.ball = False
+		self.basketball_created = False
+		self.update_ball_state()
 
 	def update_basketball(self, dt):
+		self.ball_timer += dt
 		if not self.ball or self.basketball_created:
 			return
-		
-		if self.height == 0:
-			if random.random() > .996:
-				self.velocity = self.jump_speed
-				self.height = self.jump_start
 		
 		if self.height != 0:
 			if self.frame_index == len(self.animation) - 1:
 				self.release_ball("shoot")
+			return
+
+		if self.ball_timer > self.action_time:
+			if self.action_type == 'shoot':
+				self.velocity = self.jump_speed
+				self.height = self.jump_start
 
 	def update(self, dt, screen, time, winner):
 		self.winner = winner

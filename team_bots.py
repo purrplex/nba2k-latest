@@ -189,7 +189,8 @@ class TeamBots(pygame.sprite.Sprite):
 	def deffensive_position(self):
 		self.status = "left"
 		self.speed = 0
-		self.position.x -= 850
+		pos = random.choice(self.target_pos)
+		self.position = pygame.math.Vector2(pos[0]-850, pos[1])
 		self.rect.center = round(self.position.x), round(self.position.y)
 		self.deffensive = True
 
@@ -197,7 +198,8 @@ class TeamBots(pygame.sprite.Sprite):
 		self.deffensive = False
 		self.status = "right"
 		self.speed = 0
-		self.position.x += 850
+		pos = random.choice(self.target_pos)
+		self.position = pygame.math.Vector2(pos[0], pos[1])
 		self.rect.center = round(self.position.x), round(self.position.y)
 
 
@@ -283,9 +285,12 @@ class TeamBots(pygame.sprite.Sprite):
 		if self.direction.magnitude() != 0:
 			self.direction = self.direction.normalize()
 
-		if not self.free_throw:
+		if not self.free_throw and not self.ball:
 			self.face_player()
 			self.move_to_position()
+		elif self.ball:
+			self.move_to_position()
+			self.status = "right"
 
 		# Gradually decrease speed
 		if self.speed > self.min_speed:
@@ -311,6 +316,7 @@ class TeamBots(pygame.sprite.Sprite):
 		self.speed = max(self.min_speed, min(self.speed, self.max_speed))
 
 		if self.landing:
+			self.ball = False
 			self.pass_steal = False
 
 		if self.position.x < 20:
@@ -490,11 +496,25 @@ class TeamBots(pygame.sprite.Sprite):
 		
 		self.create_basketball(ball_data)
 		self.basketball_created = True
-		self.ball = False
+
+	def update_ball_state(self):
+		self.height = 0
+		self.velocity = 0
+		self.direction = pygame.math.Vector2(0,0)
+		self.frame_index = 0
+		self.speed = 0
+		self.steal = False
+		self.passing = False
 		
 	def give_ball(self):
 		self.ball = True
 		self.basketball_created = False
+		self.update_ball_state()
+
+	def take_ball(self):
+		self.ball = False
+		self.basketball_created = False
+		self.update_ball_state()
 
 	def update_basketball(self, dt):
 		if not self.ball or self.basketball_created:

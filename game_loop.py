@@ -6,12 +6,16 @@ def game_loop(self):
 	self.tipoff_music.stop()
 	self.game_music.play(loops=-1)
 	while True:
-
+		ball_holder = self.ball_holder
+		self.ball_holder_updated = False
 		events = pygame.event.get()
+		mouse = None
 		for event in events:
 			if event.type == pygame.QUIT:
 				pygame.quit()
 				sys.exit()
+			if event.type == pygame.MOUSEBUTTONDOWN:
+				mouse = event.pos
 
 		dt = self.clock.tick(60) / 1000
 
@@ -77,11 +81,12 @@ def game_loop(self):
 					if flop:
 						free_throw = True
 
+					if bot.ball:
+						ball_holder = bot
 				# colliding_sprites = self.testball.update() + self.testball2.update()
-
 				# for sprite in colliding_sprites:
-				# 	if sprite == self.player:
-				# 		self.player.give_ball()
+					# if sprite == self.player:
+						# self.player.give_ball()
 
 				self.outOfBounds, flop, fall, reach, ball_blocked = self.player.update(
 					dt,
@@ -91,6 +96,9 @@ def game_loop(self):
 					self.winner,
 					self.selected_player,
 				)
+
+				if self.player.ball:
+					ball_holder = self.player
 
 				if ball_blocked:
 					block_type = 'FOUL'
@@ -109,20 +117,24 @@ def game_loop(self):
 						self.FreeThrow.start(self.screen, self.opp_bots[0])
 					self.FreeThrow.end()
 					self.free_throw = False
-					self.give_ball(self.player)
+					self.update_play(self.player)
 
 		if self.basketball:
 			self.basketball.update(dt)
 			
 		self.show_niceshot(dt)
 
+		if not self.ball_holder_updated:
+			if ball_holder != self.ball_holder:
+				self.update_play(ball_holder)
+
 		if self.outOfBounds:
 			self.ball = False
 			self.snap = False
 			self.qtr += 1
 
-			 
 
+		self.draw_sound_toggle(dt, mouse)
 		pygame.display.update()
 
 

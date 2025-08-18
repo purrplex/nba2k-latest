@@ -149,8 +149,6 @@ class Basketball(pygame.sprite.Sprite):
 				self.height = -250 * self.scale_factor
 				self.velocity *= -.67
 				self.bounces += 1
-				if self.bounces >= 1:
-					self.rebound()
 			
 		self.hoop_detection(dt, left_side=True)
 		self.hoop_detection(dt)
@@ -182,11 +180,13 @@ class Basketball(pygame.sprite.Sprite):
 			self.rect.top = self.ceiling
 			self.direction.y *= -0.67
 			self.velocity *= -0.67
+			self.bounces += 1
 		
 		if self.rect.bottom > 850:
 			self.rect.bottom = 850
 			self.direction.y *= -0.67
 			self.velocity *= -0.67
+			self.bounces += 1
 
 	def update(self, dt):
 		self.last_pos = self.pos.copy()
@@ -203,6 +203,7 @@ class Basketball(pygame.sprite.Sprite):
 		else:
 			self.handle_catch()
 
-
+		if self.bounces >= 1:
+			self.rebound()
 #
 
