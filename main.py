@@ -306,7 +306,8 @@ class Game:
 		if self.offensiveplay:
 			self.update_play(closest)
 		elif self.deffensiveplay:
-			self.update_play(self.player)
+			self.player.offensiveplay_screen(self.screen)
+			self.update_play(self.player, True)
 
 		self.ball_scored_info = None
 		self.ball_scored_pos = None
