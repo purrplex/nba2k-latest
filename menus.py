@@ -333,6 +333,10 @@ def start_screen(self):
                         self.continue_menu,
                         self.selected_player,
                     )
+                    if self.winner:
+                        self.update_play(self.player)
+                    else:
+                        self.update_play(self.opp_bots[1])
 
         self.render_start_screen()
         self.win_condition()

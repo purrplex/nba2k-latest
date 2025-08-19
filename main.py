@@ -796,9 +796,9 @@ class Game:
 		continue_menu(self)
 
 	def run(self):
-		self.update_play(self.player)
-		self.game_loop()
 		self.start_menu()
+		# self.update_play(self.player)
+		# self.game_loop()
 
 
 if __name__ == "__main__":
