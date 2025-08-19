@@ -77,6 +77,8 @@ def game_loop(self):
 				free_throw = False
 				reach = False
 				for bot in self.bots_group:
+					if bot == self.player:
+						continue
 					__, flop = bot.update(dt, self.screen, time, self.winner)
 					if flop:
 						free_throw = True
@@ -102,35 +104,41 @@ def game_loop(self):
 
 				if 'block' in player_action:
 					block_type = 'FOUL'
+					free_throw = True
 					if random.random() > 0.5:
+						self.clear_ball_state()
 						block_type = 'TURNOVER'
+						free_throw = False
+						self.update_play(self.player, show_offense_screen=True)
 
 					self.show_text(block_type, self.WINDOW_WIDTH/2, 400, (255,255,0))
 
 				if 'steal' in player_action:
+					self.clear_ball_state()
 					self.player.offensiveplay_screen(self.screen)
 					self.update_play(self.player, show_offense_screen=True)
 
+
 				if free_throw or player_action in ['flop', 'fall', 'reach'] or flop:
-					print(player_action)
 					self.free_throw = True
+					self.clear_ball_state()
 					if self.offensiveplay:
 						self.free_throw_shooter = self.player
 						self.FreeThrow.start(self.screen, self.player)
 					elif self.deffensiveplay:
 						self.free_throw_shooter = self.opp_bots[0]
 						self.FreeThrow.start(self.screen, self.opp_bots[0])
-					self.FreeThrow.end()
-					self.free_throw = False
-					self.update_play(self.player, True)
+					#self.update_play(self.player)
+					ball_holder = self.player
 
 		if self.basketball:
 			self.basketball.update(dt)
 			
 		self.show_niceshot(dt)
-
-		if not self.ball_holder_updated:
+		
+		if not self.ball_holder_updated and not self.free_throw:
 			if ball_holder != self.ball_holder:
+				self.clear_ball_state()
 				self.update_play(ball_holder)
 
 		if self.outOfBounds:
@@ -138,18 +146,32 @@ def game_loop(self):
 			self.snap = False
 			self.qtr += 1
 
-		if self.ball_scored_info:
-			self.animation_wait_timer += dt
-			if self.animation_wait_timer > 1.2:
-				self.animation_wait_timer = 0
-				self.finish_scored()
+		if self.free_throw and self.missshot_timer > 0:
+			self.missshot_timer -= dt
+			if self.missshot_timer <= 0:
+				self.FreeThrow.end()
+				self.free_throw = False
+				self.update_play(self.player, True)
 
-		if self.ball_rebound_pos:
-			self.animation_wait_timer += dt
-			if self.animation_wait_timer > 0.5:
-				self.animation_wait_timer = 0
-				self.finish_rebound()
+		if self.niceshot_timer <= 0:
+			if self.free_throw:
+				self.animation_wait_timer += dt
+				if self.animation_wait_timer > 1:
+					self.animation_wait_timer = 0
+					self.FreeThrow.end()
+					self.free_throw = False
+					self.update_play(self.player, True)
+			if self.ball_scored_info:
+				self.animation_wait_timer += dt
+				if self.animation_wait_timer > 1.2:
+					self.animation_wait_timer = 0
+					self.finish_scored()
 
+			if self.ball_rebound_pos:
+				self.animation_wait_timer += dt
+				if self.animation_wait_timer > 0.5:
+					self.animation_wait_timer = 0
+					self.finish_rebound()
 
 		self.draw_sound_toggle(dt, mouse)
 		pygame.display.update()

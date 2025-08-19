@@ -69,6 +69,7 @@ class Game:
 		self.team_bots_created = False
 		self.opp_bots_created = False
 		self.niceshot_timer = 0
+		self.missshot_timer = 0
 		self.niceshot_timer_dur = 1
 
 		# Menu variables
@@ -290,7 +291,6 @@ class Game:
 		self.ball_holder_updated = True
 
 	def finish_scored(self):
-		print('scored')
 		self.FreeThrow.basketball_event('score')
 		three_pointer = abs(self.ball_scored_info.get('distance').x) > 450
 		point_value = 2
@@ -318,6 +318,8 @@ class Game:
 		self.ball_rebound_pos = None
 		self.basketball.direction = pygame.math.Vector2(0,0)
 		if self.ball_scored_info:
+			if self.free_throw:
+				self.finish_rebound()
 			return
 		self.niceshot_timer = self.niceshot_timer_dur
 		self.ball_scored_info = ball_info
@@ -329,6 +331,8 @@ class Game:
 	def update_play(self, player, show_offense_screen=False):
 		offense = isinstance(player, (TeamBots, Player))
 		if self.ball_holder and self.deffensiveplay != offense:
+			if show_offense_screen:
+				self.player.offensiveplay_screen(self.screen)
 			self.give_ball(player)
 			return
 		self.offensiveplay = offense
@@ -342,7 +346,6 @@ class Game:
 					bot.offensive_position()
 			for pos in self.opp_bots:
 				pos.offensive_position()
- 
 		
 		if self.deffensiveplay:
 			self.player.deffensiveplay_screen(self.screen)
@@ -362,7 +365,10 @@ class Game:
 			closest = random.choice(self.opp_bots)
 			self.same_team_count = 0
 		else:
-			closest = self.get_closest_bot(self.ball_rebound_pos)
+			if self.ball_rebound_pos:
+				closest = self.get_closest_bot(self.ball_rebound_pos)
+			else:
+				closest = self.get_closest_bot(pygame.math.Vector2(1100,500))
 		if self.offensiveplay:
 			self.same_team_count += 1
 			self.update_play(closest)
@@ -375,17 +381,33 @@ class Game:
 			self.basketball = None
 
 	def basketball_rebound(self, pos):
+		if self.free_throw:
+			self.FreeThrow.basketball_event('rebound')
+		self.missshot_timer = 1
 		self.ball_scored_info = None
 		self.ball_scored_pos = None
 		if self.ball_rebound_pos:
+			if self.free_throw:
+				pass
+				#self.finish_rebound()
 			return
+
 		self.ball_rebound_pos = self.basketball.pos.copy()
 
 		if self.free_throw:
-			self.finish_rebound()
+			pass
+			#self.finish_rebound()
 		
 	def basketball_catch(self, pos, player):
 		self.update_play(player)
+		if self.basketball:
+			self.basketball.remove()
+			self.basketball = None
+
+	def clear_ball_state(self):
+		if self.ball_holder:
+			self.ball_holder.take_ball()
+
 		if self.basketball:
 			self.basketball.remove()
 			self.basketball = None

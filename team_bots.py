@@ -216,6 +216,7 @@ class TeamBots(pygame.sprite.Sprite):
 			self.ball = False
 
 	def free_throw_exit(self):
+		self.update_ball_state()
 		self.free_throw = False
 		position = random.choice(self.target_pos)
 		self.position = vector(position[0], position[1])

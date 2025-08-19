@@ -2,6 +2,7 @@ import pygame
 import random
 from pygame.math import Vector2 as vector
 from stats import PLAYER_STATS
+import math
 
 
 class OppBots(pygame.sprite.Sprite):
@@ -18,6 +19,7 @@ class OppBots(pygame.sprite.Sprite):
 		self.frame_index = 0
 		self.direction = vector(1, 0)
 		self.position = vector(pos)
+		self.shoot_pos = None
 		self.rect = None
 		self.outOfBounds = outOfBounds
 		self.create_basketball = create_basketball
@@ -55,6 +57,9 @@ class OppBots(pygame.sprite.Sprite):
 		self.max_action_time = 6
 		self.min_action_time = 3
 		self.action_type = 'shoot'
+		self.shootpower = 1
+		self.miss = False
+		self.freethrow_power = 0.9
 
 		self.stop = 0
 		self.ball = None
@@ -193,28 +198,17 @@ class OppBots(pygame.sprite.Sprite):
 			self.ball = False
 
 	def free_throw_exit(self):
+		self.update_ball_state()
 		self.free_throw = False
 		self.position = self.player.position.copy()
 		self.position.x += 120
 
-	def shoot(self):
+	def shoot(self, miss=False):
 		if self.free_throw:
 			self.ball = True
-			self.shootpower = random.random() * 0.2 + 0.8
+			self.shootpower = self.freethrow_power
+			self.miss = miss
 			 
-		self.jump_sound.play()
-		self.velocity = self.jump_speed
-		self.height = self.jump_start
-		self.basketball_created = False
-		self.frame_index = 0
-		self.direction = pygame.math.Vector2(0, 0)
-
-
-	def shoot_miss(self):
-		if self.free_throw:
-			self.ball = True
-			self.shootpower = random.random() * 0.5 + 0.9
-
 		self.jump_sound.play()
 		self.velocity = self.jump_speed
 		self.height = self.jump_start
@@ -260,6 +254,32 @@ class OppBots(pygame.sprite.Sprite):
 			self.direction = vector(0, 0)
 			self.delay_move = True
 			self.delay_move_timer = 0
+			self.delay = random.random()*0.1 + 0.1
+
+	def move_to_shoot_pos(self):
+		if not self.shoot_pos:
+			cx = 750
+			cy = 580
+			radius = random.randint(0,150)
+			angle = random.random() * math.pi * 2
+			x = math.cos(angle) * radius
+			y = math.sin(angle) * radius
+			x += cx
+			y += cy
+			self.shoot_pos = vector(x, y)
+
+		direction = self.shoot_pos - self.position
+		dist = direction.magnitude()
+		if dist < 10:
+			self.direction = vector(0,0)
+			self.shoot_pos = None
+			self.delay_move = True
+			self.delay_move_timer = 0
+			self.delay = random.random() * 0.5 + 0.3
+			return
+
+		if dist != 0:
+			self.direction = direction.normalize()
 
 	def move(self, dt, screen, time):
 		if self.direction.magnitude() != 0:
@@ -267,15 +287,16 @@ class OppBots(pygame.sprite.Sprite):
 
 		if self.delay_move:
 			self.delay_move_timer += dt
+			self.direction = vector(0,0)
 			if self.delay_move_timer > self.delay:
-				self.delay = random.random()*0.1 + 0.1
 				self.delay_move_timer = 0
 				self.delay_move = False
 		elif not self.free_throw and not self.ball:
 			self.face_player()
 			self.move_to_player()
 		elif self.ball:
-			self.move_to_player()
+			#self.move_to_player()
+			self.move_to_shoot_pos()
 			self.status = "left"
 
 		# Gradually decrease speed
@@ -485,7 +506,8 @@ class OppBots(pygame.sprite.Sprite):
 		ball_data = {
 			'player':self,
 			'shootpower':shootpower,
-			'action':action
+			'action':action,
+			'miss': self.miss,
 		}
 		
 		if self.status == "right":
@@ -494,9 +516,10 @@ class OppBots(pygame.sprite.Sprite):
 		elif self.status == "left":
 			ball_data['pos'] = (self.rect.topleft[0] + 50, self.rect.topleft[1] + 10)
 			ball_data['direction'] = (self.hoop['lakers'] - self.position).normalize()
-			
+
 		self.create_basketball(ball_data)
 		self.basketball_created = True
+		self.shoot_pos = None
 		# self.ball = False
 		
 	def deffensive_position(self):
@@ -523,6 +546,7 @@ class OppBots(pygame.sprite.Sprite):
 		self.passing = False
 		
 	def give_ball(self):
+		self.miss = False
 		self.ball = True
 		self.basketball_created = False
 		self.update_ball_state()

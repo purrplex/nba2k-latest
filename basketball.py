@@ -40,6 +40,7 @@ class Basketball(pygame.sprite.Sprite):
 		self.on_rebound = data.get('rebound')
 		self.on_catch = data.get('catch')
 		self.shooting = data.get('action') == "shoot"
+		self.miss = data.get('miss', False)
 		
 		if not self.shooting:
 			self.pos.y += abs(self.direction.y) * 200
@@ -144,6 +145,11 @@ class Basketball(pygame.sprite.Sprite):
 			return
 
 		if not self.ball_done:
+			if self.miss:
+				self.direction.x *= -0.67
+				self.direction.y *= 0.5
+				self.bounces += 1
+				return
 			self.scored()
 		
 	def handle_shooting(self, dt):
