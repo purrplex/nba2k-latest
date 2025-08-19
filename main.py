@@ -46,7 +46,7 @@ class Game:
 		self.player_group = pygame.sprite.Group()
 		self.bots_group = pygame.sprite.Group()
 		self.inbounder_group = pygame.sprite.Group()
-		self.testball_group = pygame.sprite.Group()
+		# self.testball_group = pygame.sprite.Group()
 		self.player_select_group = pygame.sprite.Group()
 
 		# variables
@@ -169,24 +169,24 @@ class Game:
 		self.FreeThrow = FreeThrow(self)
 		
 		self.basketball = None
-		self.testball = TestBall(
-			(200, 700),
-			(
-				self.testball_group,
-				self.all_sprites_group,
-				self.player_group,
-				self.bots_group,
-			),
-		)
-		self.testball2 = TestBall(
-			(1960, 700),
-			(
-				self.testball_group,
-				self.all_sprites_group,
-				self.player_group,
-				self.bots_group,
-			),
-		)
+		# self.testball = TestBall(
+		# 	(200, 700),
+		# 	(
+		# 		self.testball_group,
+		# 		self.all_sprites_group,
+		# 		self.player_group,
+		# 		self.bots_group,
+		# 	),
+		# )
+		# self.testball2 = TestBall(
+		# 	(1960, 700),
+		# 	(
+		# 		self.testball_group,
+		# 		self.all_sprites_group,
+		# 		self.player_group,
+		# 		self.bots_group,
+		# 	),
+		# )
 
 		# channels
 		if not hasattr(self, "start_channel"):
