@@ -442,7 +442,10 @@ def continue_menu(self):
                         sys.exit()
 
                     elif self.continue_item[self.continue_selected_index] == "Continue":
+                        self.update_play(self.player)
                         self.game_loop()
+
+                        
 
         pygame.display.flip()
 
