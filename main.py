@@ -374,6 +374,7 @@ class Game:
 			self.same_team_count += 1
 			self.update_play(closest)
 		elif self.deffensiveplay:
+			self.player.offensiveplay_screen(self.screen)
 			self.update_play(self.player, True)
 
 		self.ball_rebound_pos = None
