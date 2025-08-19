@@ -31,14 +31,14 @@ class FreeThrow:
 					self.shooter.shoot()
 					self.shooter_shot = True
 				if self.ft_bar <= 0:
-					self.shooter.shoot_miss()
+					self.shooter.shoot(miss=True)
 					self.shooter_shot = True
 			elif self.game.deffensiveplay:
 				if self.ft_bar >= 100:
-					self.shooter.shoot_miss()
+					self.shooter.shoot()
 					self.shooter_shot = True
 				if self.ft_bar <= 0:
-					self.shooter.shoot()
+					self.shooter.shoot(miss=True)
 					self.shooter_shot = True
 
 	def draw(self, screen):

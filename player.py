@@ -19,6 +19,8 @@ class Player(pygame.sprite.Sprite):
 		self.selected_player = "brunson"
 		self.dttimer = 0
 		self.shootpower = 1
+		self.freethrow_power = 0.8
+		self.miss = False
 		self.import_assets()
 		self.animation = self.animations["idle"]
 		self.image = self.animation[self.frame_index]
@@ -46,6 +48,7 @@ class Player(pygame.sprite.Sprite):
 		self.passselecting = None
 		self.steal = False
 		self.stealing = False
+		self.steal_radius = 250
 		self.landing = None
 		self.flopping = False
 		self.flopped = False
@@ -209,6 +212,7 @@ class Player(pygame.sprite.Sprite):
 			self.ball = False
 
 	def free_throw_exit(self):
+		self.update_ball_state()
 		self.free_throw = False
 		self.position = pygame.math.Vector2(1100, 500)
 
@@ -259,35 +263,18 @@ class Player(pygame.sprite.Sprite):
 	def draw(self, screen):
 		screen.blit(self.image, self.rect)
 
-	def shoot(self):
+	def shoot(self, miss=False):
 		if self.free_throw:
 			self.ball = True
 			self.shooting = True
-			self.shootpower = random.random() * 0.2 + 0.8
+			self.shootpower = self.freethrow_power
 		else:
 			power = min(self.dttimer, 2.5) / 2.5
 			self.dttimer = 0
 			self.shoottimer = False
 			self.shootpower = power * 5
-			
-		self.jump_sound.play()
-		self.velocity = self.jump_speed
-		self.height = self.jump_start
-		self.basketball_created = False
-		self.frame_index = 0
-		self.direction = pygame.math.Vector2(0, 0)
 
-	def shoot_miss(self):
-		if self.free_throw:
-			self.ball = True
-			self.shooting = True
-			self.shootpower = random.random() * 0.5 + 0.9
-		else:
-			power = min(self.dttimer, 2.5) / 2.5
-			self.dttimer = 0
-			self.shoottimer = False
-			self.shootpower = power * 6
-			
+		self.miss = miss
 		self.jump_sound.play()
 		self.velocity = self.jump_speed
 		self.height = self.jump_start
@@ -312,12 +299,11 @@ class Player(pygame.sprite.Sprite):
 
 		can_steal = self.bot_in_range(bot, radius)
 		chance = random.randint(0,1)
-		if can_steal and chance != 1:
-			self.frame_index = 0
-			self.steal = True
-		elif can_steal and chance == 1:
+		if can_steal and chance == 1:
 			self.reach = True
-			
+
+		self.frame_index = 0
+		self.steal = True	
 
 	def input(self, events, dt, screen):
 		for event in events:
@@ -339,7 +325,7 @@ class Player(pygame.sprite.Sprite):
 					self.passselecting = True
 					
 				elif event.key == pygame.K_d and not self.steal and not self.ball:
-					radius = 200
+					radius = self.steal_radius
 					self.try_steal(radius, screen)
 
 				if event.key == pygame.K_a and not self.flopping and not self.ball:
@@ -439,17 +425,21 @@ class Player(pygame.sprite.Sprite):
 					
 	def animation_done(self):
 		self.frame_index = len(self.animation) - 1
-		if self.ball and not self.basketball_created:
+		if self.shooting:
 			self.speed = 0
 			if self.height != 0:
 				self.release_ball("shoot")
 			elif self.passing:
 				self.release_ball("pass")
 				self.passing = False
-			self.basketball_created = True
+			self.basketball_created = False
 			self.ball = False
+			self.shooting = False
 		elif self.steal:
-			self.return_action = 'steal'
+			bot = self.get_bot_with_ball()
+			can_steal = self.bot_in_range(bot, radius=self.steal_radius)
+			if can_steal:
+				self.return_action = 'steal'
 			# bot.take_ball()
 
 		if self.reach:
@@ -640,10 +630,14 @@ class Player(pygame.sprite.Sprite):
 		screen.blit(speed_surface, speed_rect)
 		
 	def release_ball(self, action, target=None):
+		if not self.ball:
+			return
+			
 		ball_data = {
 			'player':self,
 			'shootpower':self.shootpower,
-			'action':action
+			'action':action,
+			'miss': self.miss
 		}
 		
 		if self.status == "right":
@@ -658,10 +652,7 @@ class Player(pygame.sprite.Sprite):
 			if target:
 				ball_data['direction'] = (self.bot.position - self.position).normalize()   
 
-
 		self.create_basketball(ball_data)
-		self.basketball_created = True
-		# self.ball = True
 
 	def update_ball_state(self):
 		self.height = 0
@@ -673,7 +664,9 @@ class Player(pygame.sprite.Sprite):
 		self.passing = False
 		
 	def give_ball(self):
+		self.miss = False
 		self.ball = True
+		self.is_idle = False
 		self.basketball_created = False
 		self.update_ball_state()
 
@@ -707,10 +700,6 @@ class Player(pygame.sprite.Sprite):
 			elif self.passing:
 				self.release_ball("pass")
 				self.passing = False
-			self.basketball_created = True
-			self.ball = False
-				
-
 
 	def update(self, dt, events, screen, team, winner, selected_player):
 		if (self.team, self.selected_player) != (team, selected_player):
