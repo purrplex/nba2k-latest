@@ -216,6 +216,6 @@ class Basketball(pygame.sprite.Sprite):
 		else:
 			self.handle_catch()
 
-		if not self.ball_done and self.bounces >= 1:
+		if not self.ball_done and self.height <= 0:
 			self.rebound()
-#
+
