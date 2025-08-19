@@ -124,7 +124,7 @@ class FreeThrow:
 		if self.game.offensiveplay:
 			self.game.player.free_throw_init(1500, 500, self.shooter)
 		elif self.game.deffensiveplay:
-			self.game.player.free_throw_init(500, 500, self.shooter)
+			self.game.player.free_throw_init(500, 600, self.shooter)
 
 		if self.shooter:
 			if self.game.offensiveplay:
