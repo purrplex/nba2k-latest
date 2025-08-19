@@ -368,11 +368,12 @@ class Game:
 		else:
 			if self.ball_rebound_pos:
 				closest = self.get_closest_bot(self.ball_rebound_pos)
+				closestteam = random.choice(self.team_bots)
 			else:
 				closest = self.get_closest_bot(pygame.math.Vector2(1100,500))
 		if self.offensiveplay:
 			self.same_team_count += 1
-			self.update_play(closest)
+			self.update_play(closestteam)
 		elif self.deffensiveplay:
 			self.player.offensiveplay_screen(self.screen)
 			self.update_play(self.player, True)
