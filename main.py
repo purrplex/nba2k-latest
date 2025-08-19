@@ -339,8 +339,8 @@ class Game:
 		self.deffensiveplay = not offense
 
 		if self.offensiveplay:
-			if show_offense_screen:
-				self.player.offensiveplay_screen(self.screen)
+		# 	if show_offense_screen:
+		# 		self.player.offensiveplay_screen(self.screen)
 			for bot in self.team_bots: 
 				if bot != self.player:
 					bot.offensive_position()
